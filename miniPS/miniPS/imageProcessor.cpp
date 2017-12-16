@@ -47,3 +47,26 @@ std::vector<int> ImageProcessor::getPixelVal(int x, int y, int idx) {
 	}
 	return ans;
 }
+
+void ImageProcessor::channelSplit(int rgbNum, int idx) {
+	int iChannels = images[idx].channels();
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	if (rgbNum != 0 && rgbNum != 1 && rgbNum != 2) {
+		qDebug("channel split fail: rgbNum not in {0,1,2}\n");
+		return;
+	}
+	if (iChannels != 3) {
+		qDebug("channel split fail: channel != 3\n");
+		return;
+	}
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			for (int k = 0; k < 3; k++) {
+				if (k == rgbNum)
+					break;
+				images[idx].at<Vec3b>(i, j)[k] = images[idx].at<Vec3b>(i, j)[rgbNum];
+			}
+		}
+	}
+}

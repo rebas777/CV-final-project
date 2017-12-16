@@ -37,6 +37,8 @@ private:
 	// Image processor to process all image operations
 	ImageProcessor myProcessor;
 
+	void refreshImg();
+
 
 private slots:
 void on_slotTabChang_trigged(int cur);

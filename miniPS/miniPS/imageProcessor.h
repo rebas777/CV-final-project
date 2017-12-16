@@ -19,4 +19,6 @@ public:
 	void saveImage(const char *name, int idx);
 	void showImage(int idx); // For debug only
 	std::vector<int> getPixelVal(int x, int y, int idx);
+
+	void channelSplit(int rgbNum, int idx);
 };

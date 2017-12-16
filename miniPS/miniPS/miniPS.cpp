@@ -170,25 +170,28 @@ void miniPS::on_slotLoadImage_trigged() {
 	{
 		    
 			myProcessor.loadImage(qPrintable(fileName), focusedLayer);
-			QImage tmp = cvMat2QImage(myProcessor.images[focusedLayer]);
-			int width = myProcessor.images[focusedLayer].cols;
-			int height = myProcessor.images[focusedLayer].rows;
-			//QGraphicsScene *scene = new QGraphicsScene;
-			MyScene *scene = new MyScene();
-			connect(scene, SIGNAL(mouseMove(int, int)),
-				this, SLOT(on_viewMouseMove_trigged(int, int)));
-			scene->setParentView(*myViews[focusedLayer]);
-			scene->addPixmap(QPixmap::fromImage(tmp));
-			myViews[focusedLayer]->setScene(scene);
-			myViews[focusedLayer]->resetSize();
-			ui.horizontalSlider->setValue(100);
-			myViews[focusedLayer]->resize(width + 10,
-				height + 10);
-			myViews[focusedLayer]->show();
-			QString sizeStr;
-			sizeStr.sprintf("%d * %d px", width, height);
-			ui.label_imagesize->setText(sizeStr);
+			refreshImg();
 	}
+}
+
+void miniPS::refreshImg() {
+	int width = myProcessor.images[focusedLayer].cols;
+	int height = myProcessor.images[focusedLayer].rows;
+	QImage tmp = cvMat2QImage(myProcessor.images[focusedLayer]);
+	MyScene *scene = new MyScene();
+	connect(scene, SIGNAL(mouseMove(int, int)),
+		this, SLOT(on_viewMouseMove_trigged(int, int)));
+	scene->setParentView(*myViews[focusedLayer]);
+	scene->addPixmap(QPixmap::fromImage(tmp));
+	myViews[focusedLayer]->setScene(scene);
+	myViews[focusedLayer]->resetSize();
+	ui.horizontalSlider->setValue(100);
+	myViews[focusedLayer]->resize(width + 10,
+		height + 10);
+	myViews[focusedLayer]->show();
+	QString sizeStr;
+	sizeStr.sprintf("%d * %d px", width, height);
+	ui.label_imagesize->setText(sizeStr);
 }
 
 void miniPS::on_slotSave_trigged() {
