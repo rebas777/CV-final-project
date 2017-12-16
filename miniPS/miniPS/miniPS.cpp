@@ -8,6 +8,9 @@ miniPS::miniPS(QWidget *parent)
 	ui.setupUi(this);
 	showMaximized();
 
+	// Initialize image processor
+	//myProcessor.showImage(3);
+
 	//init focused layer
 	focusedLayer = 0;
 
@@ -30,7 +33,7 @@ miniPS::miniPS(QWidget *parent)
 
 	//init 5 images
 	for (int i = 0; i < NLAYERS; i++) {
-		this->images[i] = new QImage();
+		//this->images[i] = new QImage();
 		this->imagesDirtyFlag[i] = 0;
 	}
 
@@ -57,6 +60,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.cutBtn, SIGNAL(clicked()), this, SLOT(on_slotCutBtn_trigged()));
 	connect(ui.actionclean_all_layers, SIGNAL(triggered()), this, SLOT(on_slotClean_trigged()));
 	
+	
 	//set shortcut for menu
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
@@ -75,11 +79,80 @@ miniPS::miniPS(QWidget *parent)
 
 miniPS::~miniPS() {
 	for (int i = 0; i < NLAYERS; i++) {
-		delete this->images[i];
+		//delete this->images[i];
 		delete this->myViews[i];
 	}
 }
 
+
+QImage cvMat2QImage(const Mat& mat)
+{
+	// 8-bits unsigned, NO. OF CHANNELS = 1  
+	if (mat.type() == CV_8UC1)
+	{
+		QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
+		// Set the color table (used to translate colour indexes to qRgb values)  
+		image.setColorCount(256);
+		for (int i = 0; i < 256; i++)
+		{
+			image.setColor(i, qRgb(i, i, i));
+		}
+		// Copy input Mat  
+		uchar *pSrc = mat.data;
+		for (int row = 0; row < mat.rows; row++)
+		{
+			uchar *pDest = image.scanLine(row);
+			memcpy(pDest, pSrc, mat.cols);
+			pSrc += mat.step;
+		}
+		return image;
+	}
+	// 8-bits unsigned, NO. OF CHANNELS = 3  
+	else if (mat.type() == CV_8UC3)
+	{
+		// Copy input Mat  
+		const uchar *pSrc = (const uchar*)mat.data;
+		// Create QImage with same dimensions as input Mat  
+		QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_RGB888);
+		return image.rgbSwapped();
+	}
+	else if (mat.type() == CV_8UC4)
+	{
+		//qDebug() << "CV_8UC4";
+		// Copy input Mat  
+		const uchar *pSrc = (const uchar*)mat.data;
+		// Create QImage with same dimensions as input Mat  
+		QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_ARGB32);
+		return image.copy();
+	}
+	else
+	{
+		//qDebug() << "ERROR: Mat could not be converted to QImage.";
+		return QImage();
+	}
+}
+
+Mat QImage2cvMat(QImage image)
+{
+	cv::Mat mat;
+	//qDebug() << image.format();
+	switch (image.format())
+	{
+	case QImage::Format_ARGB32:
+	case QImage::Format_RGB32:
+	case QImage::Format_ARGB32_Premultiplied:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	case QImage::Format_RGB888:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+		cv::cvtColor(mat, mat, CV_BGR2RGB);
+		break;
+	case QImage::Format_Indexed8:
+		mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+		break;
+	}
+	return mat;
+}
 
 void miniPS::on_slotLoadImage_trigged() {
 	if (imagesDirtyFlag[focusedLayer] == 1) {
@@ -95,25 +168,26 @@ void miniPS::on_slotLoadImage_trigged() {
 		"Image files (*.bmp *.jpg *.pbm *.pgm *.png *.ppm *.xbm *.xpm);;All files (*.*)");
 	if (fileName != "")
 	{
-		if (images[focusedLayer]->load(fileName))
-		{
+		    
+			myProcessor.loadImage(qPrintable(fileName), focusedLayer);
+			QImage tmp = cvMat2QImage(myProcessor.images[focusedLayer]);
+			int width = myProcessor.images[focusedLayer].cols;
+			int height = myProcessor.images[focusedLayer].rows;
 			//QGraphicsScene *scene = new QGraphicsScene;
 			MyScene *scene = new MyScene();
+			connect(scene, SIGNAL(mouseMove(int, int)),
+				this, SLOT(on_viewMouseMove_trigged(int, int)));
 			scene->setParentView(*myViews[focusedLayer]);
-			scene->addPixmap(QPixmap::fromImage(*images[focusedLayer]));
+			scene->addPixmap(QPixmap::fromImage(tmp));
 			myViews[focusedLayer]->setScene(scene);
-			//myViews[focusedLayer]->scene();
 			myViews[focusedLayer]->resetSize();
 			ui.horizontalSlider->setValue(100);
-			myViews[focusedLayer]->resize(images[focusedLayer]->width() + 10,
-				images[focusedLayer]->height() + 10);
+			myViews[focusedLayer]->resize(width + 10,
+				height + 10);
 			myViews[focusedLayer]->show();
 			QString sizeStr;
-			int imageWidth = images[focusedLayer]->width();
-			int imageHeight = images[focusedLayer]->height();
-			sizeStr.sprintf("%d * %d px", imageWidth, imageHeight);
+			sizeStr.sprintf("%d * %d px", width, height);
 			ui.label_imagesize->setText(sizeStr);
-		}
 	}
 }
 
@@ -121,7 +195,7 @@ void miniPS::on_slotSave_trigged() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
 		"stickYourFinger", tr("Images (*.png *.bmp *.jpg)"));
 	if (fileName != "") {
-		images[focusedLayer]->save(fileName);
+		myProcessor.saveImage(qPrintable(fileName), focusedLayer);
 		QMessageBox::about(NULL, "Saved", "Your current image is saved.");
 	}
 }
@@ -162,8 +236,8 @@ void miniPS::on_slotTabChang_trigged(int cur) {
 	focusedLayer = cur;
 	myViews[focusedLayer]->mode = 0;
 	QString sizeStr;
-	int imageWidth = images[focusedLayer]->width();
-	int imageHeight = images[focusedLayer]->height();
+	int imageWidth = myProcessor.images[focusedLayer].cols;
+	int imageHeight = myProcessor.images[focusedLayer].rows;
 	sizeStr.sprintf("%d * %d px", imageWidth, imageHeight);
 	ui.label_imagesize->setText(sizeStr);
 	ui.label_height->setText("0");
@@ -214,7 +288,12 @@ void miniPS::on_slotCutBtn_trigged() {
 	int maxX = (beginPoint.x() >= endPoint.x()) ? beginPoint.x() : endPoint.x();
 	int minY = (beginPoint.y() <= endPoint.y()) ? beginPoint.y() : endPoint.y();
 	int maxY = (beginPoint.y() >= endPoint.y()) ? beginPoint.y() : endPoint.y();
-	QImage newImage = images[focusedLayer]->copy(minX, minY, (maxX - minX), (maxY - minY));
+	if (minX < 0)  minX = 0;
+	if (minY < 0)  minY = 0;
+	if (maxX >= myProcessor.images[focusedLayer].cols)
+		maxX = myProcessor.images[focusedLayer].cols - 1;
+	if (maxY >= myProcessor.images[focusedLayer].rows)
+		maxY = myProcessor.images[focusedLayer].rows - 1;
 	// Find the first layer whose image is already saved, and put the copy into that layer
 	int j = focusedLayer;
 	for (int i = 0; i < NLAYERS; i++) {
@@ -222,16 +301,16 @@ void miniPS::on_slotCutBtn_trigged() {
 		if (imagesDirtyFlag[j] == 0)
 			break;
 	}
-
-	*images[j] = newImage;
+	myProcessor.images[j] = myProcessor.images[focusedLayer](Rect(minX, minY, (maxX - minX), (maxY - minY)));
+	QImage tmp = cvMat2QImage(myProcessor.images[j]);
 	MyScene *scene = new MyScene();
 	scene->setParentView(*myViews[j]);
-	scene->addPixmap(QPixmap::fromImage(newImage));
+	scene->addPixmap(QPixmap::fromImage(tmp));
 	myViews[j]->setScene(scene);
 	myViews[j]->resetSize();
 	ui.horizontalSlider->setValue(100);
-	myViews[j]->resize(newImage.width() + 10,
-		newImage.height() + 10);
+	myViews[j]->resize(myProcessor.images[j].cols + 10,
+		myProcessor.images[j].rows + 10);
 	myViews[j]->show();
 	imagesDirtyFlag[j] = 1;
 }
@@ -243,4 +322,33 @@ void miniPS::on_slotClean_trigged() {
 		myViews[i]->setScene(scene);
 		imagesDirtyFlag[i] = 0;
 	}
+}
+
+void miniPS::on_viewMouseMove_trigged(int x, int y) {
+	//qDebug("don't stop!");
+	if (x < 0)  x = 0;
+	if (y < 0)  y = 0;
+	if (x >= myProcessor.images[focusedLayer].cols)
+		x = myProcessor.images[focusedLayer].cols - 1;
+	if (y >= myProcessor.images[focusedLayer].rows)
+		y = myProcessor.images[focusedLayer].rows - 1;
+	std::vector<int> ans = myProcessor.getPixelVal(x, y, focusedLayer);
+	QString tmp;
+	if (ans[3] == 1) {
+		tmp.sprintf("%d", ans[0]);
+		ui.label_rVal->setText(tmp);
+		tmp.sprintf("%d", ans[1]);
+		ui.label_gVal->setText(tmp);
+		tmp.sprintf("%d", ans[2]);
+		ui.label_bVal->setText(tmp);
+		ui.label_gsVal->setText("-");
+	}
+	else if(ans[3] == 0) {
+		ui.label_rVal->setText("-");
+		ui.label_gVal->setText("-");
+		ui.label_bVal->setText("-");
+		tmp.sprintf("%d", ans[0]);
+		ui.label_gsVal->setText(tmp);
+	}
+	
 }

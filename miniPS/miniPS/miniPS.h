@@ -6,6 +6,7 @@
 #include "myScene.h"
 #include "QFileDialog"
 #include "QMessageBox"
+#include "imageProcessor.h"
 
 #define NLAYERS 5
 #define ZOOM_IN_RATE 1.2
@@ -28,11 +29,13 @@ private:
 	// Which layer are the user looking at
 	int focusedLayer;
 	// List of images
-	QImage *images[NLAYERS];
+	//QImage *images[NLAYERS];
 	// List of containers to hold images
 	MyView *myViews[NLAYERS];
 	// List to record whether a layer is modified and unsaved
 	int imagesDirtyFlag[NLAYERS];
+	// Image processor to process all image operations
+	ImageProcessor myProcessor;
 
 
 private slots:
@@ -51,4 +54,5 @@ void on_slotSlctMode_trigged();
 void on_slotNormMode_trigged();
 void on_slotCutBtn_trigged();
 void on_slotClean_trigged();
+void on_viewMouseMove_trigged(int x, int y);  // Self-defined slot
 };

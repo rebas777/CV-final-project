@@ -28,7 +28,8 @@ private:
 	MyView *parentView; //scene hold ptr to a view and view hold ptr to UIclass so that scene can manipulate UIclass directly
 	bool m_isMousePress;
 	
-	
+signals:
+	void mouseMove(int x, int y); // self-defined signal, triggered when view mouseMoveEven happen.
 
 	
 };

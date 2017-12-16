@@ -13,6 +13,7 @@ void MyView::setParentUI(Ui::miniPSClass  &parent) {
 	this->parentUI = &parent;
 }
 
+
 //MyScene MyView::getChild() {
 //	return child_scene;
 //}

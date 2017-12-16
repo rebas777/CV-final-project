@@ -39,6 +39,7 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 	}
 	posX = event->scenePos().x();
 	posY = event->scenePos().y();
+	emit mouseMove(posX, posY);
 	QString xStr, yStr;
 	xStr.sprintf("%d", posX);
 	yStr.sprintf("%d", posY);
