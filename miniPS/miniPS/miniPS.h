@@ -41,6 +41,7 @@ private:
 
 
 private slots:
+void on_slotUndo_trigged();
 void on_slotTabChang_trigged(int cur);
 void on_slotLoadImage_trigged();
 void on_slotExit_trigged();
@@ -57,4 +58,8 @@ void on_slotNormMode_trigged();
 void on_slotCutBtn_trigged();
 void on_slotClean_trigged();
 void on_viewMouseMove_trigged(int x, int y);  // Self-defined slot
+void on_channelSplitR_trigged();
+void on_channelSplitG_trigged();
+void on_channelSplitB_trigged();
+void on_rgb2gry_trigged();
 };

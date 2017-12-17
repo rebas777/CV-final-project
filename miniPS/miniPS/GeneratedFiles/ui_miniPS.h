@@ -41,6 +41,10 @@ public:
     QAction *actionwindowed;
     QAction *actionexit;
     QAction *actionclean_all_layers;
+    QAction *actionRGB2GrayScale;
+    QAction *actionRed;
+    QAction *actionGreen;
+    QAction *actionBlue;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -102,6 +106,8 @@ public:
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
+    QMenu *menucolor_operation;
+    QMenu *menuchannel_split;
     QMenu *menuSettings;
     QMenu *menuWindow_mode;
     QMenu *menuHelp;
@@ -129,6 +135,14 @@ public:
         actionexit->setObjectName(QStringLiteral("actionexit"));
         actionclean_all_layers = new QAction(miniPSClass);
         actionclean_all_layers->setObjectName(QStringLiteral("actionclean_all_layers"));
+        actionRGB2GrayScale = new QAction(miniPSClass);
+        actionRGB2GrayScale->setObjectName(QStringLiteral("actionRGB2GrayScale"));
+        actionRed = new QAction(miniPSClass);
+        actionRed->setObjectName(QStringLiteral("actionRed"));
+        actionGreen = new QAction(miniPSClass);
+        actionGreen->setObjectName(QStringLiteral("actionGreen"));
+        actionBlue = new QAction(miniPSClass);
+        actionBlue->setObjectName(QStringLiteral("actionBlue"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -362,6 +376,10 @@ public:
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menucolor_operation = new QMenu(menuEdit);
+        menucolor_operation->setObjectName(QStringLiteral("menucolor_operation"));
+        menuchannel_split = new QMenu(menucolor_operation);
+        menuchannel_split->setObjectName(QStringLiteral("menuchannel_split"));
         menuSettings = new QMenu(menuBar);
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuWindow_mode = new QMenu(menuSettings);
@@ -388,6 +406,12 @@ public:
         menuFile->addAction(actionexit);
         menuEdit->addAction(actionundo);
         menuEdit->addAction(actionclean_all_layers);
+        menuEdit->addAction(menucolor_operation->menuAction());
+        menucolor_operation->addAction(menuchannel_split->menuAction());
+        menucolor_operation->addAction(actionRGB2GrayScale);
+        menuchannel_split->addAction(actionRed);
+        menuchannel_split->addAction(actionGreen);
+        menuchannel_split->addAction(actionBlue);
         menuSettings->addSeparator();
         menuSettings->addAction(menuWindow_mode->menuAction());
         menuWindow_mode->addAction(actionfull_screen);
@@ -421,6 +445,10 @@ public:
         actionwindowed->setText(QApplication::translate("miniPSClass", "windowed", Q_NULLPTR));
         actionexit->setText(QApplication::translate("miniPSClass", "exit", Q_NULLPTR));
         actionclean_all_layers->setText(QApplication::translate("miniPSClass", "clean all layers", Q_NULLPTR));
+        actionRGB2GrayScale->setText(QApplication::translate("miniPSClass", "RGB2GrayScale", Q_NULLPTR));
+        actionRed->setText(QApplication::translate("miniPSClass", "Red", Q_NULLPTR));
+        actionGreen->setText(QApplication::translate("miniPSClass", "Green", Q_NULLPTR));
+        actionBlue->setText(QApplication::translate("miniPSClass", "Blue", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -466,6 +494,8 @@ public:
         cutBtn->setText(QApplication::translate("miniPSClass", "cut", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("miniPSClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("miniPSClass", "Edit", Q_NULLPTR));
+        menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
+        menuchannel_split->setTitle(QApplication::translate("miniPSClass", "channel split", Q_NULLPTR));
         menuSettings->setTitle(QApplication::translate("miniPSClass", "Settings", Q_NULLPTR));
         menuWindow_mode->setTitle(QApplication::translate("miniPSClass", "window mode", Q_NULLPTR));
         menuHelp->setTitle(QApplication::translate("miniPSClass", "Help", Q_NULLPTR));

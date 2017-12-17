@@ -4,6 +4,7 @@
 ImageProcessor::ImageProcessor() {
 	Mat defaultMat;
 	images = { defaultMat , defaultMat , defaultMat , defaultMat , defaultMat };
+	imageBackups = { defaultMat , defaultMat , defaultMat , defaultMat , defaultMat };
 }
 
 void ImageProcessor::loadImage(const char* name, int idx) {
@@ -23,11 +24,11 @@ void ImageProcessor::showImage(int idx) {
 std::vector<int> ImageProcessor::getPixelVal(int x, int y, int idx) {
 
 	std::vector<int> ans;
-	QString xStr, yStr;
+	/*QString xStr, yStr;
 	xStr.sprintf("%d", x);
 	yStr.sprintf("%d", y);
 	qDebug("x = %s", qPrintable(xStr));
-	qDebug("y = %s", qPrintable(yStr));
+	qDebug("y = %s", qPrintable(yStr));*/
 
 	int iChannels = images[idx].channels();
 	int iRows = images[idx].rows;
@@ -48,7 +49,25 @@ std::vector<int> ImageProcessor::getPixelVal(int x, int y, int idx) {
 	return ans;
 }
 
+void ImageProcessor::commit(int idx) {
+	imageBackups[idx] = images[idx];
+	undoMarks[idx] = true;
+}
+
+bool ImageProcessor::undo(int idx) {
+	if (! undoMarks[idx]) {
+		return false;
+	}
+	else {
+		images[idx] = imageBackups[idx];
+		undoMarks[idx] = false;
+		return true;
+	}
+}
+
 void ImageProcessor::channelSplit(int rgbNum, int idx) {
+	commit(idx);
+	qDebug("channel split called.");
 	int iChannels = images[idx].channels();
 	int iRows = images[idx].rows;
 	int iCols = images[idx].cols;
@@ -64,9 +83,31 @@ void ImageProcessor::channelSplit(int rgbNum, int idx) {
 		for (int j = 0; j < iCols; j++) {
 			for (int k = 0; k < 3; k++) {
 				if (k == rgbNum)
-					break;
+					continue;
 				images[idx].at<Vec3b>(i, j)[k] = images[idx].at<Vec3b>(i, j)[rgbNum];
 			}
+		}
+	}
+}
+
+void ImageProcessor::rgb2gry(int idx) {
+	commit(idx);
+	int iChannels = images[idx].channels();
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	if (iChannels != 3) {
+		qDebug("RGB to grayvalue fail: channel != 3\n");
+		return;
+	}
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			int r = images[idx].at<Vec3b>(i, j)[2];
+			int g = images[idx].at<Vec3b>(i, j)[1];
+			int b = images[idx].at<Vec3b>(i, j)[0];
+			int gray = (r * 299 + g * 587 + b * 114 + 500) / 1000;
+			images[idx].at<Vec3b>(i, j)[0] = gray;
+			images[idx].at<Vec3b>(i, j)[1] = gray;
+			images[idx].at<Vec3b>(i, j)[2] = gray;
 		}
 	}
 }

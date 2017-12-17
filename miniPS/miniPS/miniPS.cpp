@@ -59,11 +59,17 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.slctModeBtn, SIGNAL(clicked()), this, SLOT(on_slotSlctMode_trigged()));
 	connect(ui.cutBtn, SIGNAL(clicked()), this, SLOT(on_slotCutBtn_trigged()));
 	connect(ui.actionclean_all_layers, SIGNAL(triggered()), this, SLOT(on_slotClean_trigged()));
+	connect(ui.actionRed, SIGNAL(triggered()), this, SLOT(on_channelSplitR_trigged()));
+	connect(ui.actionGreen, SIGNAL(triggered()), this, SLOT(on_channelSplitG_trigged()));
+	connect(ui.actionBlue, SIGNAL(triggered()), this, SLOT(on_channelSplitB_trigged()));
+	connect(ui.actionundo, SIGNAL(triggered()), this, SLOT(on_slotUndo_trigged()));
+	connect(ui.actionRGB2GrayScale, SIGNAL(triggered()), this, SLOT(on_rgb2gry_trigged()));
 	
 	
 	//set shortcut for menu
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
+	ui.actionundo->setShortcut(Qt::CTRL | Qt::Key_Z);
 
 	//set zoom slider
 	ui.horizontalSlider->setOrientation(Qt::Horizontal);
@@ -354,4 +360,34 @@ void miniPS::on_viewMouseMove_trigged(int x, int y) {
 		ui.label_gsVal->setText(tmp);
 	}
 	
+}
+
+void miniPS::on_channelSplitR_trigged() {
+	myProcessor.channelSplit(2, focusedLayer);
+	refreshImg();
+}
+
+void miniPS::on_channelSplitG_trigged() {
+	myProcessor.channelSplit(1, focusedLayer);
+	refreshImg();
+}
+
+void miniPS::on_channelSplitB_trigged() {
+	myProcessor.channelSplit(0, focusedLayer);
+	refreshImg();
+}
+
+void miniPS::on_slotUndo_trigged() {
+	if (myProcessor.undo(focusedLayer)) {
+		refreshImg();
+		QMessageBox::about(NULL, "Ooops", "Undo successfully.");
+	}
+	else {
+		QMessageBox::about(NULL, "Ooops", "No more history operation has been saved.");
+	}
+}
+
+void miniPS::on_rgb2gry_trigged() {
+	myProcessor.rgb2gry(focusedLayer);
+	refreshImg();
 }

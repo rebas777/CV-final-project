@@ -827,8 +827,24 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <widget class="QMenu" name="menucolor_operation">
+     <property name="title">
+      <string>color operation</string>
+     </property>
+     <widget class="QMenu" name="menuchannel_split">
+      <property name="title">
+       <string>channel split</string>
+      </property>
+      <addaction name="actionRed"/>
+      <addaction name="actionGreen"/>
+      <addaction name="actionBlue"/>
+     </widget>
+     <addaction name="menuchannel_split"/>
+     <addaction name="actionRGB2GrayScale"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
+    <addaction name="menucolor_operation"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -907,6 +923,26 @@
   <action name="actionclean_all_layers">
    <property name="text">
     <string>clean all layers</string>
+   </property>
+  </action>
+  <action name="actionRGB2GrayScale">
+   <property name="text">
+    <string>RGB2GrayScale</string>
+   </property>
+  </action>
+  <action name="actionRed">
+   <property name="text">
+    <string>Red</string>
+   </property>
+  </action>
+  <action name="actionGreen">
+   <property name="text">
+    <string>Green</string>
+   </property>
+  </action>
+  <action name="actionBlue">
+   <property name="text">
+    <string>Blue</string>
    </property>
   </action>
  </widget>
