@@ -10,6 +10,7 @@ miniPS::miniPS(QWidget *parent)
 
 	// Hide some components
 	ui.hsvWidget->setVisible(false);
+	ui.doubleThreshodWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
@@ -69,6 +70,9 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.horizontalSlider_h, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidH_trigged(int)));
 	connect(ui.horizontalSlider_s, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidS_trigged(int)));
 	connect(ui.horizontalSlider_v, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidV_trigged(int)));
+	connect(ui.actionOtus_Algo, SIGNAL(triggered()), this, SLOT(on_slotOtsu_trigged()));
+	connect(ui.actiondouble_threshod, SIGNAL(triggered()), this, SLOT(on_slotDbTh_trigged()));
+	connect(ui.doubleThreshodOkBtn, SIGNAL(clicked()), this, SLOT(on_slotDbThok_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -438,7 +442,6 @@ void miniPS::on_channelSplitB_trigged() {
 void miniPS::on_slotUndo_trigged() {
 	if (myProcessor.undo(focusedLayer)) {
 		refreshImg();
-		QMessageBox::about(NULL, "Ooops", "Undo successfully.");
 	}
 	else {
 		QMessageBox::about(NULL, "Ooops", "No more history operation has been saved.");
@@ -464,15 +467,13 @@ void miniPS::on_slotHSV_trigged() {
 	ui.hsvWidget->setVisible(true);
 	myProcessor.commit(focusedLayer);
 	myProcessor.makeHsvBackup(focusedLayer);
+	ui.horizontalSlider_s->setValue(0);
+	ui.horizontalSlider_v->setValue(0);
 }
 
 // When "HSV ok" button is pressed(hide hsv info)
 void miniPS::on_slotHSVok_trigged() {
 	ui.hsvWidget->setVisible(false);
-	//还原 slide bar 的值
-	ui.horizontalSlider_h->setValue(0);
-	ui.horizontalSlider_s->setValue(0);
-	ui.horizontalSlider_v->setValue(0);
 }
 
 // When HSV slider h is touched
@@ -490,5 +491,25 @@ void miniPS::on_slotHSVslidS_trigged(int cur) {
 // When HSV slider v is touched
 void miniPS::on_slotHSVslidV_trigged(int cur) {
 	myProcessor.changeHSV(2, cur, focusedLayer);
+	refreshImg();
+}
+
+// When "double threshod" button is pressed(show dbth info)
+void miniPS::on_slotDbTh_trigged() {
+	ui.doubleThreshodWidget->setVisible(true);
+}
+
+// When "dbthOK" button is pressed
+void miniPS::on_slotDbThok_trigged() {
+    //call function
+	int threshod1 = ui.inputThreshod1->value();
+	int threshod2 = ui.inputThreshod2->value();
+	myProcessor.toBinary(false, threshod1, threshod2, focusedLayer);
+	refreshImg();
+	ui.doubleThreshodWidget->setVisible(false);
+}
+
+void miniPS::on_slotOtsu_trigged() {
+	myProcessor.toBinary(true, 0, 0, focusedLayer);
 	refreshImg();
 }

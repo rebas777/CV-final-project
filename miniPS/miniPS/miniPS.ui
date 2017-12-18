@@ -912,6 +912,81 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="doubleThreshodWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <widget class="QSpinBox" name="inputThreshod1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>30</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>33</y>
+        <width>101</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Threshod 1:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>33</y>
+        <width>111</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Threshod 2:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="inputThreshod2">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>30</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="doubleThreshodOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>100</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -954,9 +1029,17 @@
      <addaction name="actionRGB2GrayScale"/>
      <addaction name="actionHSB"/>
     </widget>
+    <widget class="QMenu" name="menubinary_analysis">
+     <property name="title">
+      <string>binary analysis</string>
+     </property>
+     <addaction name="actionOtus_Algo"/>
+     <addaction name="actiondouble_threshod"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
     <addaction name="menucolor_operation"/>
+    <addaction name="menubinary_analysis"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -1060,6 +1143,16 @@
   <action name="actionHSB">
    <property name="text">
     <string>HSB</string>
+   </property>
+  </action>
+  <action name="actionOtus_Algo">
+   <property name="text">
+    <string>Otus Algo</string>
+   </property>
+  </action>
+  <action name="actiondouble_threshod">
+   <property name="text">
+    <string>double threshod</string>
    </property>
   </action>
  </widget>

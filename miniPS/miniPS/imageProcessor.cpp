@@ -24,11 +24,6 @@ void ImageProcessor::showImage(int idx) {
 std::vector<int> ImageProcessor::getPixelVal(int x, int y, int idx) {
 
 	std::vector<int> ans;
-	/*QString xStr, yStr;
-	xStr.sprintf("%d", x);
-	yStr.sprintf("%d", y);
-	qDebug("x = %s", qPrintable(xStr));
-	qDebug("y = %s", qPrintable(yStr));*/
 
 	int iChannels = images[idx].channels();
 	int iRows = images[idx].rows;
@@ -50,7 +45,7 @@ std::vector<int> ImageProcessor::getPixelVal(int x, int y, int idx) {
 }
 
 void ImageProcessor::commit(int idx) {
-	imageBackups[idx] = images[idx];
+	imageBackups[idx] = images[idx].clone();
 	undoMarks[idx] = true;
 }
 
@@ -141,4 +136,114 @@ void ImageProcessor::changeHSV(int hsvNum, int val, int idx) {
 		}
 	}
 	cvtColor(hsvImg, images[idx], CV_HSV2BGR);
+}
+
+/*Generate histogram of a grayscale image or one channel of an RGB image.
+ * Memory for ihist MUST be allocated outside the funtion.
+ * channelNum = {0, 1, 2} ---- red, green, blue
+ */
+void ImageProcessor::makeHist(int *ihist, int channelNum, int idx) {
+
+	memset(ihist, 0, sizeof(ihist));
+	int iChannels = images[idx].channels();
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	if (iChannels == 1) { // grayscale image
+		for (int i = 0; i < iRows; i++) {
+			for (int j = 0; j < iCols; j++) {
+				int tmp = images[idx].at<uchar>(i, j);
+				ihist[tmp]++;
+			}
+		}
+	}
+	else {  // RGB image
+		for (int i = 0; i < iRows; i++) {
+			for (int j = 0; j < iCols; j++) {
+				int tmp = images[idx].at<Vec3b>(i, j)[2-channelNum];
+				ihist[tmp]++;
+			}
+		}
+	}
+}
+
+/* Convert an image into binary image 
+ * Otsu and double-threshod suported
+ */
+void ImageProcessor::toBinary(bool useOtsu, int th1, int th2, int idx) {
+	commit(idx);
+	if (images[idx].channels() != 1) {
+	    // convert the image into grayscale
+		cvtColor(images[idx], images[idx], CV_RGB2GRAY);  
+		int channelsssss = images[idx].channels();
+		int foo = 0;
+	}
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	if (useOtsu) {
+		int threshod = otsu(idx);
+		for (int i = 0; i < iRows; i++) {
+			for (int j = 0; j < iCols; j++) {
+				int tmp = images[idx].at<uchar>(i, j);
+				images[idx].at<uchar>(i, j) = (tmp > threshod) ? 255 : 0;
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < iRows; i++) {
+			for (int j = 0; j < iCols; j++) {
+				int tmp = images[idx].at<uchar>(i, j);
+				if (tmp > th1 && tmp < th2) {
+					images[idx].at<uchar>(i, j) = 255;
+				}
+				else {
+					images[idx].at<uchar>(i, j) = 0;
+				}
+			}
+		}
+	}
+}
+
+int ImageProcessor::otsu(int idx) {
+	unsigned char *np; 
+	int thresholdValue = 1;
+	int ihist[256]; 
+	int i, j, k; // various counters
+	int n, n1, n2, gmin, gmax;
+	double m1, m2, sum, csum, fmax, sb;
+	gmin = 255; gmax = 0;
+	makeHist(ihist, 0, idx);
+	// set up everything
+	sum = csum = 0.0;
+	n = 0;
+	for (k = 0; k <= 255; k++)
+	{
+		sum += (double)k * (double)ihist[k]; // x*f(x) 质量矩
+		n += ihist[k]; //f(x) 质量
+	}
+	if (!n)
+	{
+		// if n has no value, there is problems
+		fprintf(stderr, "NOT NORMAL thresholdValue = 160\n");
+		return (160);
+	}
+	// do the otsu global thresholding method
+	fmax = -1.0;
+	n1 = 0;
+	for (k = 0; k < 255; k++)
+	{
+		n1 += ihist[k];
+		if (!n1) { continue; }
+		n2 = n - n1;
+		if (n2 == 0) { break; }
+		csum += (double)k *ihist[k];
+		m1 = csum / n1;
+		m2 = (sum - csum) / n2;
+		sb = (double)n1 *(double)n2 *(m1 - m2) * (m1 - m2);
+		/**//* bbg: note: can be optimized. */
+		if (sb > fmax) {
+			fmax = sb;
+			thresholdValue = k;
+		}
+	}
+	return(thresholdValue);
 }

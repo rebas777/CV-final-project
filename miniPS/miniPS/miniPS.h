@@ -74,4 +74,7 @@ void on_slotHSVok_trigged();
 void on_slotHSVslidH_trigged(int cur);
 void on_slotHSVslidS_trigged(int cur);
 void on_slotHSVslidV_trigged(int cur);
+void on_slotDbTh_trigged();
+void on_slotDbThok_trigged();
+void on_slotOtsu_trigged();
 };

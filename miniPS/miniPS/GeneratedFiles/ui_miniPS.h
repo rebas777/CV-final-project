@@ -23,6 +23,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
@@ -46,6 +47,8 @@ public:
     QAction *actionGreen;
     QAction *actionBlue;
     QAction *actionHSB;
+    QAction *actionOtus_Algo;
+    QAction *actiondouble_threshod;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -113,11 +116,18 @@ public:
     QLabel *label_10;
     QLabel *label_11;
     QPushButton *HSVokBtn;
+    QWidget *doubleThreshodWidget;
+    QSpinBox *inputThreshod1;
+    QLabel *label_12;
+    QLabel *label_13;
+    QSpinBox *inputThreshod2;
+    QPushButton *doubleThreshodOkBtn;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
     QMenu *menucolor_operation;
     QMenu *menuchannel_split;
+    QMenu *menubinary_analysis;
     QMenu *menuSettings;
     QMenu *menuWindow_mode;
     QMenu *menuHelp;
@@ -155,6 +165,10 @@ public:
         actionBlue->setObjectName(QStringLiteral("actionBlue"));
         actionHSB = new QAction(miniPSClass);
         actionHSB->setObjectName(QStringLiteral("actionHSB"));
+        actionOtus_Algo = new QAction(miniPSClass);
+        actionOtus_Algo->setObjectName(QStringLiteral("actionOtus_Algo"));
+        actiondouble_threshod = new QAction(miniPSClass);
+        actiondouble_threshod->setObjectName(QStringLiteral("actiondouble_threshod"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -410,6 +424,26 @@ public:
         HSVokBtn = new QPushButton(hsvWidget);
         HSVokBtn->setObjectName(QStringLiteral("HSVokBtn"));
         HSVokBtn->setGeometry(QRect(280, 190, 112, 34));
+        doubleThreshodWidget = new QWidget(containerWidget);
+        doubleThreshodWidget->setObjectName(QStringLiteral("doubleThreshodWidget"));
+        doubleThreshodWidget->setGeometry(QRect(10, 10, 441, 171));
+        inputThreshod1 = new QSpinBox(doubleThreshodWidget);
+        inputThreshod1->setObjectName(QStringLiteral("inputThreshod1"));
+        inputThreshod1->setGeometry(QRect(120, 30, 49, 25));
+        inputThreshod1->setMaximum(255);
+        label_12 = new QLabel(doubleThreshodWidget);
+        label_12->setObjectName(QStringLiteral("label_12"));
+        label_12->setGeometry(QRect(20, 33, 101, 18));
+        label_13 = new QLabel(doubleThreshodWidget);
+        label_13->setObjectName(QStringLiteral("label_13"));
+        label_13->setGeometry(QRect(200, 33, 111, 18));
+        inputThreshod2 = new QSpinBox(doubleThreshodWidget);
+        inputThreshod2->setObjectName(QStringLiteral("inputThreshod2"));
+        inputThreshod2->setGeometry(QRect(310, 30, 49, 25));
+        inputThreshod2->setMaximum(255);
+        doubleThreshodOkBtn = new QPushButton(doubleThreshodWidget);
+        doubleThreshodOkBtn->setObjectName(QStringLiteral("doubleThreshodOkBtn"));
+        doubleThreshodOkBtn->setGeometry(QRect(310, 100, 112, 34));
         miniPSClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(miniPSClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -422,6 +456,8 @@ public:
         menucolor_operation->setObjectName(QStringLiteral("menucolor_operation"));
         menuchannel_split = new QMenu(menucolor_operation);
         menuchannel_split->setObjectName(QStringLiteral("menuchannel_split"));
+        menubinary_analysis = new QMenu(menuEdit);
+        menubinary_analysis->setObjectName(QStringLiteral("menubinary_analysis"));
         menuSettings = new QMenu(menuBar);
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuWindow_mode = new QMenu(menuSettings);
@@ -449,12 +485,15 @@ public:
         menuEdit->addAction(actionundo);
         menuEdit->addAction(actionclean_all_layers);
         menuEdit->addAction(menucolor_operation->menuAction());
+        menuEdit->addAction(menubinary_analysis->menuAction());
         menucolor_operation->addAction(menuchannel_split->menuAction());
         menucolor_operation->addAction(actionRGB2GrayScale);
         menucolor_operation->addAction(actionHSB);
         menuchannel_split->addAction(actionRed);
         menuchannel_split->addAction(actionGreen);
         menuchannel_split->addAction(actionBlue);
+        menubinary_analysis->addAction(actionOtus_Algo);
+        menubinary_analysis->addAction(actiondouble_threshod);
         menuSettings->addSeparator();
         menuSettings->addAction(menuWindow_mode->menuAction());
         menuWindow_mode->addAction(actionfull_screen);
@@ -493,6 +532,8 @@ public:
         actionGreen->setText(QApplication::translate("miniPSClass", "Green", Q_NULLPTR));
         actionBlue->setText(QApplication::translate("miniPSClass", "Blue", Q_NULLPTR));
         actionHSB->setText(QApplication::translate("miniPSClass", "HSB", Q_NULLPTR));
+        actionOtus_Algo->setText(QApplication::translate("miniPSClass", "Otus Algo", Q_NULLPTR));
+        actiondouble_threshod->setText(QApplication::translate("miniPSClass", "double threshod", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -540,10 +581,14 @@ public:
         label_10->setText(QApplication::translate("miniPSClass", "S\357\274\232", Q_NULLPTR));
         label_11->setText(QApplication::translate("miniPSClass", "V:", Q_NULLPTR));
         HSVokBtn->setText(QApplication::translate("miniPSClass", "OK", Q_NULLPTR));
+        label_12->setText(QApplication::translate("miniPSClass", "Threshod 1:", Q_NULLPTR));
+        label_13->setText(QApplication::translate("miniPSClass", "Threshod 2:", Q_NULLPTR));
+        doubleThreshodOkBtn->setText(QApplication::translate("miniPSClass", "OK", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("miniPSClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("miniPSClass", "Edit", Q_NULLPTR));
         menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
         menuchannel_split->setTitle(QApplication::translate("miniPSClass", "channel split", Q_NULLPTR));
+        menubinary_analysis->setTitle(QApplication::translate("miniPSClass", "binary analysis", Q_NULLPTR));
         menuSettings->setTitle(QApplication::translate("miniPSClass", "Settings", Q_NULLPTR));
         menuWindow_mode->setTitle(QApplication::translate("miniPSClass", "window mode", Q_NULLPTR));
         menuHelp->setTitle(QApplication::translate("miniPSClass", "Help", Q_NULLPTR));

@@ -12,6 +12,9 @@ class ImageProcessor {
 
 private:
 	std::vector<bool> undoMarks = { false, false, false, false, false };
+
+	int otsu(int idx);
+	void makeHist(int *ihist, int channelNum, int idx);
 	 
 public:
 
@@ -29,6 +32,6 @@ public:
 	void rgb2gry(int idx);
 	void makeHsvBackup(int idx);
 	void changeHSV(int hsvNum, int val, int idx);
-
 	void channelSplit(int rgbNum, int idx);
+	void toBinary(bool useOtsu, int th1, int th2, int idx);
 };
