@@ -463,11 +463,16 @@ void miniPS::on_slotHSV_trigged() {
 	}
 	ui.hsvWidget->setVisible(true);
 	myProcessor.commit(focusedLayer);
+	myProcessor.makeHsvBackup(focusedLayer);
 }
 
 // When "HSV ok" button is pressed(hide hsv info)
 void miniPS::on_slotHSVok_trigged() {
 	ui.hsvWidget->setVisible(false);
+	//还原 slide bar 的值
+	ui.horizontalSlider_h->setValue(0);
+	ui.horizontalSlider_s->setValue(0);
+	ui.horizontalSlider_v->setValue(0);
 }
 
 // When HSV slider h is touched

@@ -51,7 +51,6 @@ double MyView::getScaleVal() {
 
 void MyView::keyPressEvent(QKeyEvent *event)
 {
-	qDebug("*********MyView::keyPressEvent***************");
 	switch (event->key())
 	{
 	case Qt::Key_Left:

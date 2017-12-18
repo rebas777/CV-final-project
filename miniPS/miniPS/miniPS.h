@@ -17,9 +17,9 @@
 #define HSV_H_MAX 359
 #define HSV_H_MIN 0
 #define HSV_S_MAX 255
-#define HSV_S_MIN 0
+#define HSV_S_MIN -255
 #define HSV_V_MAX 255
-#define HSV_V_MIN 0
+#define HSV_V_MIN -255
 #define HSV_STEP 20
 
 class miniPS : public QMainWindow
