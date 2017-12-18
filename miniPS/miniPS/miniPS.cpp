@@ -292,6 +292,7 @@ void miniPS::on_slotTabChang_trigged(int cur) {
 	ui.label_width->setText("0");
 	ui.label_posX->setText("0");
 	ui.label_posY->setText("0");
+	ui.doubleThreshodWidget->setVisible(false);
 }
 
 // When the zoom slider is touched
@@ -396,16 +397,8 @@ void miniPS::on_viewMouseMove_trigged(int x, int y) {
 		ui.label_gVal->setText(tmp);
 		tmp.sprintf("%d", ans[2]);
 		ui.label_bVal->setText(tmp);
-		ui.label_gsVal->setText("-");
-	}
-	else if(ans[3] == 0) {
-		ui.label_rVal->setText("-");
-		ui.label_gVal->setText("-");
-		ui.label_bVal->setText("-");
-		tmp.sprintf("%d", ans[0]);
-		ui.label_gsVal->setText(tmp);
-	}
-	
+		//ui.label_gsVal->setText("-");
+	}	
 }
 
 // Do channel split(R)
@@ -496,11 +489,19 @@ void miniPS::on_slotHSVslidV_trigged(int cur) {
 
 // When "double threshod" button is pressed(show dbth info)
 void miniPS::on_slotDbTh_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	ui.doubleThreshodWidget->setVisible(true);
 }
 
 // When "dbthOK" button is pressed
 void miniPS::on_slotDbThok_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
     //call function
 	int threshod1 = ui.inputThreshod1->value();
 	int threshod2 = ui.inputThreshod2->value();
@@ -509,7 +510,12 @@ void miniPS::on_slotDbThok_trigged() {
 	ui.doubleThreshodWidget->setVisible(false);
 }
 
+// When "otsu" button is pressed
 void miniPS::on_slotOtsu_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.toBinary(true, 0, 0, focusedLayer);
 	refreshImg();
 }

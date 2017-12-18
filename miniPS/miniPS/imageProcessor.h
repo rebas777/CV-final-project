@@ -13,8 +13,8 @@ class ImageProcessor {
 private:
 	std::vector<bool> undoMarks = { false, false, false, false, false };
 
-	int otsu(int idx);
-	void makeHist(int *ihist, int channelNum, int idx);
+	int otsu(Mat img);
+	void makeHist(int *ihist, int channelNum, Mat img);
 	 
 public:
 

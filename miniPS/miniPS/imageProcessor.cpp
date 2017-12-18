@@ -142,16 +142,16 @@ void ImageProcessor::changeHSV(int hsvNum, int val, int idx) {
  * Memory for ihist MUST be allocated outside the funtion.
  * channelNum = {0, 1, 2} ---- red, green, blue
  */
-void ImageProcessor::makeHist(int *ihist, int channelNum, int idx) {
+void ImageProcessor::makeHist(int *ihist, int channelNum, Mat img) {
 
 	memset(ihist, 0, sizeof(ihist));
-	int iChannels = images[idx].channels();
-	int iRows = images[idx].rows;
-	int iCols = images[idx].cols;
+	int iChannels = img.channels();
+	int iRows = img.rows;
+	int iCols = img.cols;
 	if (iChannels == 1) { // grayscale image
 		for (int i = 0; i < iRows; i++) {
 			for (int j = 0; j < iCols; j++) {
-				int tmp = images[idx].at<uchar>(i, j);
+				int tmp = img.at<uchar>(i, j);
 				ihist[tmp]++;
 			}
 		}
@@ -159,7 +159,7 @@ void ImageProcessor::makeHist(int *ihist, int channelNum, int idx) {
 	else {  // RGB image
 		for (int i = 0; i < iRows; i++) {
 			for (int j = 0; j < iCols; j++) {
-				int tmp = images[idx].at<Vec3b>(i, j)[2-channelNum];
+				int tmp = img.at<Vec3b>(i, j)[2-channelNum];
 				ihist[tmp]++;
 			}
 		}
@@ -171,39 +171,45 @@ void ImageProcessor::makeHist(int *ihist, int channelNum, int idx) {
  */
 void ImageProcessor::toBinary(bool useOtsu, int th1, int th2, int idx) {
 	commit(idx);
-	if (images[idx].channels() != 1) {
-	    // convert the image into grayscale
-		cvtColor(images[idx], images[idx], CV_RGB2GRAY);  
-		int channelsssss = images[idx].channels();
-		int foo = 0;
+	Mat copyImg = images[idx].clone();
+	int iRows = copyImg.rows;
+	int iCols = copyImg.cols;
+	if (copyImg.channels() != 1) {
+		// convert the image into grayscale
+		cvtColor(copyImg, copyImg, CV_RGB2GRAY);
 	}
-	int iRows = images[idx].rows;
-	int iCols = images[idx].cols;
 	if (useOtsu) {
-		int threshod = otsu(idx);
+		int threshod = otsu(copyImg);
 		for (int i = 0; i < iRows; i++) {
 			for (int j = 0; j < iCols; j++) {
-				int tmp = images[idx].at<uchar>(i, j);
-				images[idx].at<uchar>(i, j) = (tmp > threshod) ? 255 : 0;
+				int tmp = copyImg.at<uchar>(i, j);
+				copyImg.at<uchar>(i, j) = (tmp > threshod) ? 255 : 0;
 			}
 		}
 	}
 	else {
 		for (int i = 0; i < iRows; i++) {
 			for (int j = 0; j < iCols; j++) {
-				int tmp = images[idx].at<uchar>(i, j);
+				int tmp = copyImg.at<uchar>(i, j);
 				if (tmp > th1 && tmp < th2) {
-					images[idx].at<uchar>(i, j) = 255;
+					copyImg.at<uchar>(i, j) = 255;
 				}
 				else {
-					images[idx].at<uchar>(i, j) = 0;
+					copyImg.at<uchar>(i, j) = 0;
 				}
 			}
 		}
 	}
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			unsigned char tmp = copyImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
 }
 
-int ImageProcessor::otsu(int idx) {
+int ImageProcessor::otsu(Mat img) {
 	unsigned char *np; 
 	int thresholdValue = 1;
 	int ihist[256]; 
@@ -211,7 +217,7 @@ int ImageProcessor::otsu(int idx) {
 	int n, n1, n2, gmin, gmax;
 	double m1, m2, sum, csum, fmax, sb;
 	gmin = 255; gmax = 0;
-	makeHist(ihist, 0, idx);
+	makeHist(ihist, 0, img);
 	// set up everything
 	sum = csum = 0.0;
 	n = 0;

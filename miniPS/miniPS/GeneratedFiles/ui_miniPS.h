@@ -72,8 +72,6 @@ public:
     QLabel *label_rVal;
     QLabel *label_gVal;
     QLabel *label_bVal;
-    QLabel *label_8;
-    QLabel *label_gsVal;
     QTabWidget *tabWidget;
     QWidget *layer1;
     QScrollArea *scrollArea;
@@ -249,12 +247,6 @@ public:
         label_bVal = new QLabel(groupBox);
         label_bVal->setObjectName(QStringLiteral("label_bVal"));
         label_bVal->setGeometry(QRect(100, 140, 81, 18));
-        label_8 = new QLabel(groupBox);
-        label_8->setObjectName(QStringLiteral("label_8"));
-        label_8->setGeometry(QRect(70, 180, 111, 18));
-        label_gsVal = new QLabel(groupBox);
-        label_gsVal->setObjectName(QStringLiteral("label_gsVal"));
-        label_gsVal->setGeometry(QRect(170, 180, 81, 18));
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
         tabWidget->setGeometry(QRect(170, 40, 1212, 863));
@@ -553,8 +545,6 @@ public:
         label_rVal->setText(QApplication::translate("miniPSClass", "0", Q_NULLPTR));
         label_gVal->setText(QApplication::translate("miniPSClass", "0", Q_NULLPTR));
         label_bVal->setText(QApplication::translate("miniPSClass", "0", Q_NULLPTR));
-        label_8->setText(QApplication::translate("miniPSClass", "GrayScale:", Q_NULLPTR));
-        label_gsVal->setText(QApplication::translate("miniPSClass", "0", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(layer1), QApplication::translate("miniPSClass", "Image1", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(layer2), QApplication::translate("miniPSClass", "Image2", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(layer3), QApplication::translate("miniPSClass", "Image3", Q_NULLPTR));
