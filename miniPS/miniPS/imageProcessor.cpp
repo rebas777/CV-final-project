@@ -111,3 +111,17 @@ void ImageProcessor::rgb2gry(int idx) {
 		}
 	}
 }
+
+void ImageProcessor::changeHSV(int hsvNum, int val, int idx) {
+
+	Mat hsvImg(images[idx].size(), CV_8U, Scalar(0));
+	cvtColor(images[idx], hsvImg, CV_RGB2HSV);
+	int iRows = hsvImg.rows;
+	int iCols = hsvImg.cols;
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			hsvImg.at<Vec3b>(i, j)[hsvNum] = val;
+		}
+	}
+	cvtColor(hsvImg, images[idx], CV_HSV2BGR);
+}

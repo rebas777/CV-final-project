@@ -8,8 +8,8 @@ miniPS::miniPS(QWidget *parent)
 	ui.setupUi(this);
 	showMaximized();
 
-	// Initialize image processor
-	//myProcessor.showImage(3);
+	// Hide some components
+	ui.hsvWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
@@ -64,20 +64,45 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionBlue, SIGNAL(triggered()), this, SLOT(on_channelSplitB_trigged()));
 	connect(ui.actionundo, SIGNAL(triggered()), this, SLOT(on_slotUndo_trigged()));
 	connect(ui.actionRGB2GrayScale, SIGNAL(triggered()), this, SLOT(on_rgb2gry_trigged()));
+	connect(ui.actionHSB, SIGNAL(triggered()), this, SLOT(on_slotHSV_trigged()));
+	connect(ui.HSVokBtn, SIGNAL(clicked()), this, SLOT(on_slotHSVok_trigged()));
+	connect(ui.horizontalSlider_h, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidH_trigged(int)));
+	connect(ui.horizontalSlider_s, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidS_trigged(int)));
+	connect(ui.horizontalSlider_v, SIGNAL(valueChanged(int)), this, SLOT(on_slotHSVslidV_trigged(int)));
 	
 	
-	//set shortcut for menu
+	// Set shortcut for menu
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
 	ui.actionundo->setShortcut(Qt::CTRL | Qt::Key_Z);
 
-	//set zoom slider
+	// Set zoom slider
 	ui.horizontalSlider->setOrientation(Qt::Horizontal);
 	ui.horizontalSlider->setMaximum(ZOOM_MAX);
 	ui.horizontalSlider->setMinimum(ZOOM_MIN);
 	ui.horizontalSlider->setSingleStep(ZOOM_STEP);
 	ui.horizontalSlider->setTickInterval(50);
 	ui.horizontalSlider->setTickPosition(QSlider::TicksAbove);
+
+	// Set HSV slider
+	ui.horizontalSlider_h->setOrientation(Qt::Horizontal);
+	ui.horizontalSlider_s->setOrientation(Qt::Horizontal);
+	ui.horizontalSlider_v->setOrientation(Qt::Horizontal);
+	ui.horizontalSlider_h->setMaximum(HSV_H_MAX);
+	ui.horizontalSlider_h->setMinimum(HSV_H_MIN);
+	ui.horizontalSlider_h->setSingleStep(HSV_STEP);
+	ui.horizontalSlider_s->setMaximum(HSV_S_MAX);
+	ui.horizontalSlider_s->setMinimum(HSV_S_MIN);
+	ui.horizontalSlider_s->setSingleStep(HSV_STEP);
+	ui.horizontalSlider_v->setMaximum(HSV_V_MAX);
+	ui.horizontalSlider_v->setMinimum(HSV_V_MIN);
+	ui.horizontalSlider_v->setSingleStep(HSV_STEP);
+	ui.horizontalSlider_h->setTickInterval(30);
+	ui.horizontalSlider_h->setTickPosition(QSlider::TicksAbove);
+	ui.horizontalSlider_s->setTickInterval(30);
+	ui.horizontalSlider_s->setTickPosition(QSlider::TicksAbove);
+	ui.horizontalSlider_v->setTickInterval(30);
+	ui.horizontalSlider_v->setTickPosition(QSlider::TicksAbove);
 
 	setMouseTracking(true);
 	ui.centralWidget->setMouseTracking(true);
@@ -160,6 +185,7 @@ Mat QImage2cvMat(QImage image)
 	return mat;
 }
 
+// When load image
 void miniPS::on_slotLoadImage_trigged() {
 	if (imagesDirtyFlag[focusedLayer] == 1) {
 		QMessageBox::StandardButton rb = QMessageBox::question(NULL,
@@ -180,6 +206,7 @@ void miniPS::on_slotLoadImage_trigged() {
 	}
 }
 
+// Whenever need to refresh image
 void miniPS::refreshImg() {
 	int width = myProcessor.images[focusedLayer].cols;
 	int height = myProcessor.images[focusedLayer].rows;
@@ -200,6 +227,7 @@ void miniPS::refreshImg() {
 	ui.label_imagesize->setText(sizeStr);
 }
 
+// When save image
 void miniPS::on_slotSave_trigged() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
 		"stickYourFinger", tr("Images (*.png *.bmp *.jpg)"));
@@ -209,37 +237,44 @@ void miniPS::on_slotSave_trigged() {
 	}
 }
 
+// When exit the application
 void miniPS::on_slotExit_trigged() {
 	/*QCloseEvent *event = new QCloseEvent();
 	this->closeEvent(event);*/
 	//TODO: how to close the app in window level ??
 }
 
+// When minimize the window
 void miniPS::on_slotMin_trigged() {
 	showMinimized();
 }
 
+// When set the window to FULLSCREEN mode
 void miniPS::on_slotWinModeFull_trigged() {
 	showFullScreen();
 }
 
+// When set the window to WINDOWED mode
 void miniPS::on_slotWinModeWined_trigged() {
 	showNormal();
 	showMaximized();
 }
 
+// When the + (zoom in) button is pressed
 void miniPS::on_slotZoomIn_trigged() {
 	myViews[focusedLayer]->zoomInOut(ZOOM_IN_RATE);
 	double scaleVal = myViews[focusedLayer]->getScaleVal();
 	ui.horizontalSlider->setValue((int)(scaleVal * 100));
 }
 
+// When the - (zoom out) button is pressed
 void miniPS::on_slotZoomOut_trigged() {
 	myViews[focusedLayer]->zoomInOut(ZOOM_OUT_RATE);
 	double scaleVal = myViews[focusedLayer]->getScaleVal();
 	ui.horizontalSlider->setValue((int)(scaleVal * 100));
 }
 
+// When tab changed
 // 切换 tab 的时候自动把模式切回 normal ，并且把相关的UI显示的数据置为0
 void miniPS::on_slotTabChang_trigged(int cur) {
 	focusedLayer = cur;
@@ -255,12 +290,14 @@ void miniPS::on_slotTabChang_trigged(int cur) {
 	ui.label_posY->setText("0");
 }
 
+// When the zoom slider is touched
 void miniPS::on_slotZoomSlid(int cur) {
 	float scaleVal = cur / 100.0;
 	myViews[focusedLayer]->resetSize();
 	myViews[focusedLayer]->zoomInOut(scaleVal);
 }
 
+// When the zoom slider is touched, also need to update the displayed value
 void miniPS::on_slotFreshScalVal() {
 	double scaleVal = myViews[focusedLayer]->getScaleVal();
 	QString scaleValStr;
@@ -268,6 +305,7 @@ void miniPS::on_slotFreshScalVal() {
 	ui.label_scaleVal->setText(scaleValStr);
 }
 
+// When the "norm" button is pressed(change to the normal mode)
 void miniPS::on_slotNormMode_trigged() {
 	myViews[focusedLayer]->mode = 0;
 	//TODO:remove the rectangle
@@ -277,6 +315,7 @@ void miniPS::on_slotNormMode_trigged() {
 	myViews[focusedLayer]->freshView();
 }
 
+// When the "slct" button is pressed(change to the selection mode)
 void miniPS::on_slotSlctMode_trigged() {
 	if (myViews[focusedLayer]->scene() == NULL) {
 		QMessageBox::about(NULL, "Load Image First", "Please load an image before selection");
@@ -286,6 +325,7 @@ void miniPS::on_slotSlctMode_trigged() {
 	//TODO:change cursor
 }
 
+// When the "cut" button is pressed
 void miniPS::on_slotCutBtn_trigged() {
 	if (myViews[focusedLayer]->mode != 1) {
 		QMessageBox::about(NULL, "Need Select First", "Please press slct button and select an area before cutting.");
@@ -324,6 +364,7 @@ void miniPS::on_slotCutBtn_trigged() {
 	imagesDirtyFlag[j] = 1;
 }
 
+// Whenever need to clear one of the images
 void miniPS::on_slotClean_trigged() {
 	for (int i = 0; i < NLAYERS; i++) {
 		MyScene *scene = new MyScene();
@@ -333,6 +374,7 @@ void miniPS::on_slotClean_trigged() {
 	}
 }
 
+// Self-defined SLOT triggered by a SIGNAL from MyScene
 void miniPS::on_viewMouseMove_trigged(int x, int y) {
 	//qDebug("don't stop!");
 	if (x < 0)  x = 0;
@@ -362,21 +404,37 @@ void miniPS::on_viewMouseMove_trigged(int x, int y) {
 	
 }
 
+// Do channel split(R)
 void miniPS::on_channelSplitR_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.channelSplit(2, focusedLayer);
 	refreshImg();
 }
 
+// Do channel split(G)
 void miniPS::on_channelSplitG_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.channelSplit(1, focusedLayer);
 	refreshImg();
 }
 
+// Do channel split(B)
 void miniPS::on_channelSplitB_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.channelSplit(0, focusedLayer);
 	refreshImg();
 }
 
+// When "undo" button is pressed
 void miniPS::on_slotUndo_trigged() {
 	if (myProcessor.undo(focusedLayer)) {
 		refreshImg();
@@ -387,7 +445,45 @@ void miniPS::on_slotUndo_trigged() {
 	}
 }
 
+// Change an rgb-image into grayscale one
 void miniPS::on_rgb2gry_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.rgb2gry(focusedLayer);
+	refreshImg();
+}
+
+// When "HSB" button is pressed(show hsv info)
+void miniPS::on_slotHSV_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.hsvWidget->setVisible(true);
+	myProcessor.commit(focusedLayer);
+}
+
+// When "HSV ok" button is pressed(hide hsv info)
+void miniPS::on_slotHSVok_trigged() {
+	ui.hsvWidget->setVisible(false);
+}
+
+// When HSV slider h is touched
+void miniPS::on_slotHSVslidH_trigged(int cur) {
+	myProcessor.changeHSV(0, cur, focusedLayer);
+	refreshImg();
+}
+
+// When HSV slider s is touched
+void miniPS::on_slotHSVslidS_trigged(int cur) {
+	myProcessor.changeHSV(1, cur, focusedLayer);
+	refreshImg();
+}
+
+// When HSV slider v is touched
+void miniPS::on_slotHSVslidV_trigged(int cur) {
+	myProcessor.changeHSV(2, cur, focusedLayer);
 	refreshImg();
 }

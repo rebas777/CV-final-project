@@ -14,6 +14,13 @@
 #define ZOOM_MAX 1000 //1000% by origin
 #define ZOOM_MIN 20   //20% by origin
 #define ZOOM_STEP 20  //zoom step used by slider
+#define HSV_H_MAX 359
+#define HSV_H_MIN 0
+#define HSV_S_MAX 255
+#define HSV_S_MIN 0
+#define HSV_V_MAX 255
+#define HSV_V_MIN 0
+#define HSV_STEP 20
 
 class miniPS : public QMainWindow
 {
@@ -62,4 +69,9 @@ void on_channelSplitR_trigged();
 void on_channelSplitG_trigged();
 void on_channelSplitB_trigged();
 void on_rgb2gry_trigged();
+void on_slotHSV_trigged();
+void on_slotHSVok_trigged();
+void on_slotHSVslidH_trigged(int cur);
+void on_slotHSVslidS_trigged(int cur);
+void on_slotHSVslidV_trigged(int cur);
 };

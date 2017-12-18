@@ -26,6 +26,7 @@ public:
 	void commit(int idx);
 	bool undo(int idx);
 	void rgb2gry(int idx);
+	void changeHSV(int hsvNum, int val, int idx);
 
 	void channelSplit(int rgbNum, int idx);
 };
