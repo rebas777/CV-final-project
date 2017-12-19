@@ -662,12 +662,16 @@ public:
         inputResizeWidth = new QSpinBox(resizeWidget);
         inputResizeWidth->setObjectName(QStringLiteral("inputResizeWidth"));
         inputResizeWidth->setGeometry(QRect(110, 70, 49, 25));
+        inputResizeWidth->setMinimum(1);
+        inputResizeWidth->setMaximum(9999);
         label_33 = new QLabel(resizeWidget);
         label_33->setObjectName(QStringLiteral("label_33"));
         label_33->setGeometry(QRect(230, 70, 71, 18));
         inputResizeHeight = new QSpinBox(resizeWidget);
         inputResizeHeight->setObjectName(QStringLiteral("inputResizeHeight"));
         inputResizeHeight->setGeometry(QRect(310, 70, 49, 25));
+        inputResizeHeight->setMinimum(1);
+        inputResizeHeight->setMaximum(99999);
         resizeOkBtn = new QPushButton(resizeWidget);
         resizeOkBtn->setObjectName(QStringLiteral("resizeOkBtn"));
         resizeOkBtn->setGeometry(QRect(270, 150, 131, 34));

@@ -660,5 +660,6 @@ void miniPS::on_resizeOk_trigged() {
 		ui.resizeWidget->setVisible(false);
 		return;
 	}
+	refreshImg();
 	ui.resizeWidget->setVisible(false);
 }

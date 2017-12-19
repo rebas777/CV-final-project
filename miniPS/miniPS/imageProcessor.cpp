@@ -349,10 +349,24 @@ bool ImageProcessor::divisionOper(int idx1, int idx2) {
 }
 
 void ImageProcessor::resize(int width, int height, int choiceNum, int idx) {
+	commit(idx);
+	Mat newImg(height, width, images[idx].type());
 	if (choiceNum == NN) { // Use NN
-	    
+		int srcHeight = images[idx].rows;
+		int srcWidth = images[idx].cols;
+		float hRate = (float)srcHeight / height;
+		float wRate = (float)srcWidth / width;
+		int srcX, srcY;
+		for (int i = 0; i < height; i++) {
+			srcY = int(i * hRate);
+			for (int j = 0; j < width; j++) {
+				srcX = int(j * wRate);
+				newImg.at<Vec3b>(i, j) = images[idx].at<Vec3b>(srcY, srcX);
+			}
+		}
 	}
 	else if(choiceNum == LINEAR){ // Use LINEAR
 	
 	}
+	images[idx] = newImg;
 }

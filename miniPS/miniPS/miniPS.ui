@@ -1602,6 +1602,12 @@
         <height>25</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
+      </property>
      </widget>
      <widget class="QLabel" name="label_33">
       <property name="geometry">
@@ -1624,6 +1630,12 @@
         <width>49</width>
         <height>25</height>
        </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>99999</number>
       </property>
      </widget>
      <widget class="QPushButton" name="resizeOkBtn">
