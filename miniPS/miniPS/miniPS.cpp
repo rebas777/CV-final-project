@@ -87,6 +87,8 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.substractionOkBtn, SIGNAL(clicked()), this, SLOT(on_subOk_trigged()));
 	connect(ui.multiplicationOkBtn, SIGNAL(clicked()), this, SLOT(on_multiOk_trigged()));
 	//connect(ui.divisionOkBtn, SIGNAL(clicked()), this, SLOT(on_dvdOk_trigged()));
+	connect(ui.actionresize, SIGNAL(triggered()), this, SLOT(on_slotResize_trigged()));
+	connect(ui.resizeOkBtn, SIGNAL(clicked()), this, SLOT(on_resizeOk_trigged()));
 
 	
 	
@@ -629,10 +631,34 @@ void miniPS::on_dvdOk_trigged() {
 
 // When "resize" button is pressed
 void miniPS::on_slotResize_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	ui.resizeWidget->setVisible(true);
 }
 
 // Do resize operation
 void miniPS::on_resizeOk_trigged() {
+	int height = ui.inputResizeHeight->value();
+	int width = ui.inputResizeWidth->value();
+	if (ui.inputChoiceNN->checkState() == Qt::Checked) {
+		if (ui.inputChoiceLINEAR->checkState() == Qt::Checked) {// Both are checked
+			QMessageBox::about(NULL, "Oooops", "You can only check one choice");
+			ui.resizeWidget->setVisible(false);
+			return;
+		}
+		else {// use NN
+			myProcessor.resize(width, height, NN, focusedLayer);
+		}
+	}
+	else if (ui.inputChoiceLINEAR->checkState() == Qt::Checked) {// use LINEAR
+		myProcessor.resize(width, height, LINEAR, focusedLayer);
+	}
+	else {// None are checked
+		QMessageBox::about(NULL, "Oooops", "You must take one choice");
+		ui.resizeWidget->setVisible(false);
+		return;
+	}
 	ui.resizeWidget->setVisible(false);
 }

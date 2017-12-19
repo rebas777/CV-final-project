@@ -6,6 +6,9 @@
 #include <QGraphicsView>  
 #include <vector>
 
+#define NN 0
+#define LINEAR 1
+
 using namespace cv;
 
 class ImageProcessor {
@@ -38,4 +41,5 @@ public:
 	void subtractionOper(int idx1, int idx2, int posX, int posY);
 	bool multiplicationOper(int idx1, int idx2);
 	bool divisionOper(int idx1, int idx2);
+	void resize(int width, int height, int choiceNum, int idx);
 };

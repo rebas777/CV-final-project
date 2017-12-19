@@ -347,3 +347,12 @@ bool ImageProcessor::divisionOper(int idx1, int idx2) {
 		}
 	}
 }
+
+void ImageProcessor::resize(int width, int height, int choiceNum, int idx) {
+	if (choiceNum == NN) { // Use NN
+	    
+	}
+	else if(choiceNum == LINEAR){ // Use LINEAR
+	
+	}
+}

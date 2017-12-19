@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGroupBox>
@@ -50,6 +51,7 @@ public:
     QAction *actionHSB;
     QAction *actionOtus_Algo;
     QAction *actiondouble_threshod;
+    QAction *actionresize;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -164,6 +166,15 @@ public:
     QSpinBox *inputDvdImg1;
     QSpinBox *inputDvdImg2;
     QPushButton *divisionOkBtn;
+    QWidget *resizeWidget;
+    QLabel *label_31;
+    QCheckBox *inputChoiceLINEAR;
+    QCheckBox *inputChoiceNN;
+    QLabel *label_32;
+    QSpinBox *inputResizeWidth;
+    QLabel *label_33;
+    QSpinBox *inputResizeHeight;
+    QPushButton *resizeOkBtn;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -211,6 +222,8 @@ public:
         actionOtus_Algo->setObjectName(QStringLiteral("actionOtus_Algo"));
         actiondouble_threshod = new QAction(miniPSClass);
         actiondouble_threshod->setObjectName(QStringLiteral("actiondouble_threshod"));
+        actionresize = new QAction(miniPSClass);
+        actionresize->setObjectName(QStringLiteral("actionresize"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -631,6 +644,33 @@ public:
         divisionOkBtn = new QPushButton(divisionWidget);
         divisionOkBtn->setObjectName(QStringLiteral("divisionOkBtn"));
         divisionOkBtn->setGeometry(QRect(270, 120, 112, 34));
+        resizeWidget = new QWidget(containerWidget);
+        resizeWidget->setObjectName(QStringLiteral("resizeWidget"));
+        resizeWidget->setGeometry(QRect(10, 10, 441, 200));
+        label_31 = new QLabel(resizeWidget);
+        label_31->setObjectName(QStringLiteral("label_31"));
+        label_31->setGeometry(QRect(30, 20, 81, 18));
+        inputChoiceLINEAR = new QCheckBox(resizeWidget);
+        inputChoiceLINEAR->setObjectName(QStringLiteral("inputChoiceLINEAR"));
+        inputChoiceLINEAR->setGeometry(QRect(230, 110, 105, 22));
+        inputChoiceNN = new QCheckBox(resizeWidget);
+        inputChoiceNN->setObjectName(QStringLiteral("inputChoiceNN"));
+        inputChoiceNN->setGeometry(QRect(40, 110, 105, 22));
+        label_32 = new QLabel(resizeWidget);
+        label_32->setObjectName(QStringLiteral("label_32"));
+        label_32->setGeometry(QRect(40, 70, 61, 18));
+        inputResizeWidth = new QSpinBox(resizeWidget);
+        inputResizeWidth->setObjectName(QStringLiteral("inputResizeWidth"));
+        inputResizeWidth->setGeometry(QRect(110, 70, 49, 25));
+        label_33 = new QLabel(resizeWidget);
+        label_33->setObjectName(QStringLiteral("label_33"));
+        label_33->setGeometry(QRect(230, 70, 71, 18));
+        inputResizeHeight = new QSpinBox(resizeWidget);
+        inputResizeHeight->setObjectName(QStringLiteral("inputResizeHeight"));
+        inputResizeHeight->setGeometry(QRect(310, 70, 49, 25));
+        resizeOkBtn = new QPushButton(resizeWidget);
+        resizeOkBtn->setObjectName(QStringLiteral("resizeOkBtn"));
+        resizeOkBtn->setGeometry(QRect(270, 150, 131, 34));
         miniPSClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(miniPSClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -673,6 +713,7 @@ public:
         menuEdit->addAction(actionclean_all_layers);
         menuEdit->addAction(menucolor_operation->menuAction());
         menuEdit->addAction(menubinary_analysis->menuAction());
+        menuEdit->addAction(actionresize);
         menucolor_operation->addAction(menuchannel_split->menuAction());
         menucolor_operation->addAction(actionRGB2GrayScale);
         menucolor_operation->addAction(actionHSB);
@@ -721,6 +762,7 @@ public:
         actionHSB->setText(QApplication::translate("miniPSClass", "HSB", Q_NULLPTR));
         actionOtus_Algo->setText(QApplication::translate("miniPSClass", "Otus Algo", Q_NULLPTR));
         actiondouble_threshod->setText(QApplication::translate("miniPSClass", "double threshod", Q_NULLPTR));
+        actionresize->setText(QApplication::translate("miniPSClass", "resize", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -794,6 +836,12 @@ public:
         label_29->setText(QApplication::translate("miniPSClass", "image1:", Q_NULLPTR));
         label_30->setText(QApplication::translate("miniPSClass", "image2:", Q_NULLPTR));
         divisionOkBtn->setText(QApplication::translate("miniPSClass", "OK", Q_NULLPTR));
+        label_31->setText(QApplication::translate("miniPSClass", "Resize:", Q_NULLPTR));
+        inputChoiceLINEAR->setText(QApplication::translate("miniPSClass", "LINEAR", Q_NULLPTR));
+        inputChoiceNN->setText(QApplication::translate("miniPSClass", "NN", Q_NULLPTR));
+        label_32->setText(QApplication::translate("miniPSClass", "width:", Q_NULLPTR));
+        label_33->setText(QApplication::translate("miniPSClass", "height:", Q_NULLPTR));
+        resizeOkBtn->setText(QApplication::translate("miniPSClass", "OK", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("miniPSClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("miniPSClass", "Edit", Q_NULLPTR));
         menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
