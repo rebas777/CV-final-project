@@ -13,6 +13,9 @@ miniPS::miniPS(QWidget *parent)
 	ui.doubleThreshodWidget->setVisible(false);
 	ui.addWidget->setVisible(false);
 	ui.subtractionWidget->setVisible(false);
+	ui.multiplicationWidget->setVisible(false);
+	ui.divisionWidget->setVisible(false);
+	ui.resizeWidget->setVisible(false);
 
 
 	//init focused layer
@@ -79,10 +82,10 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.addBtn, SIGNAL(clicked()), this, SLOT(on_slotAdd_trigged()));
 	connect(ui.subtractionBtn, SIGNAL(clicked()), this, SLOT(on_slotSubtraction_trigged()));
 	connect(ui.multiplicationBtn, SIGNAL(clicked()), this, SLOT(on_slotMultiplication_trigged()));
-	connect(ui.divisionBtn, SIGNAL(clicked()), this, SLOT(on_slotDivision_trigged()));
+	//connect(ui.divisionBtn, SIGNAL(clicked()), this, SLOT(on_slotDivision_trigged()));
 	connect(ui.addOkBtn, SIGNAL(clicked()), this, SLOT(on_addOk_trigged()));
 	connect(ui.substractionOkBtn, SIGNAL(clicked()), this, SLOT(on_subOk_trigged()));
-	//connect(ui.multiplicationOkBtn, SIGNAL(clicked()), this, SLOT(on_multiOk_trigged()));
+	connect(ui.multiplicationOkBtn, SIGNAL(clicked()), this, SLOT(on_multiOk_trigged()));
 	//connect(ui.divisionOkBtn, SIGNAL(clicked()), this, SLOT(on_dvdOk_trigged()));
 
 	
@@ -544,18 +547,18 @@ void miniPS::on_slotSubtraction_trigged() {
 
 // When "multi" button is pressed
 void miniPS::on_slotMultiplication_trigged(){
-    
+	ui.multiplicationWidget->setVisible(true);
 }
 
 // When "dvd" button is pressed
 void miniPS::on_slotDivision_trigged() {
-
+	ui.divisionWidget->setVisible(true);
 }
 
 // Do add operation
 void miniPS::on_addOk_trigged() {
-	int idx1 = ui.inputAddImg1->value();
-	int idx2 = ui.inputAddImg2->value();
+	int idx1 = ui.inputAddImg1->value() - 1;
+	int idx2 = ui.inputAddImg2->value() - 1;
 	double weight1 = ui.inputAddWeight1->value();
 	double weight2 = ui.inputAddWeight2->value();
 	int posX = ui.inputAddX->value();
@@ -568,12 +571,13 @@ void miniPS::on_addOk_trigged() {
 	myProcessor.addOper(idx1, idx2, weight1, weight2, posX, posY);
 	refreshImg();
 	ui.addWidget->setVisible(false);
+	refreshImg();
 }
 
 // Do subtraction operation
 void miniPS::on_subOk_trigged() {
-	int idx1 = ui.inputSubImg1->value();
-	int idx2 = ui.inputSub2->value();
+	int idx1 = ui.inputSubImg1->value() - 1;
+	int idx2 = ui.inputSub2->value() - 1;
 	int posX = ui.inputSubX->value();
 	int posY = ui.inputSubY->value();
 	if (myViews[idx1]->scene() == NULL || myViews[idx2]->scene() == NULL) {
@@ -584,14 +588,51 @@ void miniPS::on_subOk_trigged() {
 	myProcessor.subtractionOper(idx1, idx2, posX, posY);
 	refreshImg();
 	ui.subtractionWidget->setVisible(false);
+	refreshImg();
 }
 
 // Do multiplication operation
 void miniPS::on_multiOk_trigged() {
-
+	int idx1 = ui.inputMultiImg1->value() - 1;
+	int idx2 = ui.inputMultiImg2->value() - 1;
+	if (myViews[idx1]->scene() == NULL || myViews[idx2]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.multiplicationWidget->setVisible(false);
+		return;
+	}
+	if (!myProcessor.multiplicationOper(idx1, idx2)) {
+		QMessageBox::about(NULL, "Images not in the same size", "Images must be in the same size to do multiplication");
+		ui.multiplicationWidget->setVisible(false);
+	}
+	refreshImg();
+	ui.multiplicationWidget->setVisible(false);
+	refreshImg();
 }
 
 // Do division operation
 void miniPS::on_dvdOk_trigged() {
+	int idx1 = ui.inputDvdImg1->value() - 1;
+	int idx2 = ui.inputDvdImg2->value() - 1;
+	if (myViews[idx1]->scene() == NULL || myViews[idx2]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.divisionWidget->setVisible(false);
+		return;
+	}
+	if (!myProcessor.divisionOper(idx1, idx2)) {
+		QMessageBox::about(NULL, "Images not in the same size", "Images must be in the same size to do division");
+		ui.divisionWidget->setVisible(false);
+	}
+	refreshImg();
+	ui.divisionWidget->setVisible(false);
+	refreshImg();
+}
 
+// When "resize" button is pressed
+void miniPS::on_slotResize_trigged() {
+	ui.resizeWidget->setVisible(true);
+}
+
+// Do resize operation
+void miniPS::on_resizeOk_trigged() {
+	ui.resizeWidget->setVisible(false);
 }

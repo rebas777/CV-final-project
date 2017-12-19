@@ -36,4 +36,6 @@ public:
 	void toBinary(bool useOtsu, int th1, int th2, int idx);
 	void addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY);
 	void subtractionOper(int idx1, int idx2, int posX, int posY);
+	bool multiplicationOper(int idx1, int idx2);
+	bool divisionOper(int idx1, int idx2);
 };

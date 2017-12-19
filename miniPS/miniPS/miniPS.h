@@ -85,4 +85,6 @@ void on_addOk_trigged();
 void on_subOk_trigged();
 void on_multiOk_trigged();
 void on_dvdOk_trigged();
+void on_slotResize_trigged();
+void on_resizeOk_trigged();
 };

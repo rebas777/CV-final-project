@@ -255,8 +255,95 @@ int ImageProcessor::otsu(Mat img) {
 }
 
 void ImageProcessor::addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY) {
-
+	commit(idx1);
+	int iRows1 = images[idx1].rows;
+	int iCols1 = images[idx1].cols;
+	int iRows2 = images[idx2].rows;
+	int iCols2 = images[idx2].cols;
+	int adjX = (posX >= iCols1) ? 0 : posX;// Check (posX, posY) in the range of images[idx1]
+	int adjY = (posY >= iRows1) ? 0 : posY;
+	int rangeX = (adjX + iCols2 >= iCols1) ? (iCols1 - adjX) : iCols2;// If images[idx2] is bigger, truncate it.
+	int rangeY = (adjY + iRows2 >= iRows1) ? (iRows1 - adjY) : iRows2;
+	Mat imageROI;
+	imageROI = images[idx1](Rect(posX, posY, rangeX, rangeY));
+	for (int i = 0; i < rangeY; i++) {
+		for (int j = 0; j < rangeX; j++) {
+			Vec3b left = imageROI.at<Vec3b>(i, j);
+			Vec3b right = images[idx2].at<Vec3b>(i, j);
+			Vec3b ans = weight1*left + weight2*right;
+			for (int k = 0; k < 3; k++) {
+				if (ans[k] > 255)
+					ans[k] = 255;
+			}
+			imageROI.at<Vec3b>(i, j) = ans;
+		}
+	}
 }
-void ImageProcessor::subtractionOper(int idx1, int idx2, int posX, int posY) {
 
+void ImageProcessor::subtractionOper(int idx1, int idx2, int posX, int posY) {
+	commit(idx1);
+	int iRows1 = images[idx1].rows;
+	int iCols1 = images[idx1].cols;
+	int iRows2 = images[idx2].rows;
+	int iCols2 = images[idx2].cols;
+	int adjX = (posX >= iCols1) ? 0 : posX;// Check (posX, posY) in the range of images[idx1]
+	int adjY = (posY >= iRows1) ? 0 : posY;
+	int rangeX = (adjX + iCols2 >= iCols1) ? (iCols1 - adjX) : iCols2;// If images[idx2] is bigger, truncate it.
+	int rangeY = (adjY + iRows2 >= iRows1) ? (iRows1 - adjY) : iRows2;
+	Mat imageROI;
+	imageROI = images[idx1](Rect(posX, posY, rangeX, rangeY));
+	for (int i = 0; i < rangeY; i++) {
+		for (int j = 0; j < rangeX; j++) {
+			Vec3b left = imageROI.at<Vec3b>(i, j);
+			Vec3b right = images[idx2].at<Vec3b>(i, j);
+			Vec3b ans = left - right;
+			for (int k = 0; k < 3; k++) {
+				if (ans[k] < 0)
+					ans[k] = 0;
+			}
+			imageROI.at<Vec3b>(i, j) = ans;
+		}
+	}
+}
+
+bool ImageProcessor::multiplicationOper(int idx1, int idx2) {
+	commit(idx1);
+	int iRows1 = images[idx1].rows;
+	int iCols1 = images[idx1].cols;
+	int iRows2 = images[idx2].rows;
+	int iCols2 = images[idx2].cols;
+	if (iRows1 != iRows2 || iCols1 != iCols2)
+		return false;
+	for (int i = 0; i < iRows1; i++) {
+		for (int j = 0; j < iCols1; j++) {
+			Vec3b left = images[idx1].at<Vec3b>(i, j);
+			Vec3b right = images[idx2].at<Vec3b>(i, j);
+			uchar tmp0 = left[0] * right[0]/255;
+			uchar tmp1 = left[1] * right[1] / 255;
+			uchar tmp2 = left[2] * right[2] / 255;
+			Vec3b ans = {tmp0, tmp1, tmp2};
+			images[idx1].at<Vec3b>(i, j) = ans;
+		}
+	}
+}
+
+bool ImageProcessor::divisionOper(int idx1, int idx2) {
+	commit(idx1);
+	int iRows1 = images[idx1].rows;
+	int iCols1 = images[idx1].cols;
+	int iRows2 = images[idx2].rows;
+	int iCols2 = images[idx2].cols;
+	if (iRows1 != iRows2 || iCols1 != iCols2)
+		return false;
+	for (int i = 0; i < iRows1; i++) {
+		for (int j = 0; j < iCols1; j++) {
+			Vec3b left = images[idx1].at<Vec3b>(i, j);
+			Vec3b right = images[idx2].at<Vec3b>(i, j);
+			uchar tmp0 = left[0] / right[0]  * 255;
+			uchar tmp1 = left[1] / right[1] * 255;
+			uchar tmp2 = left[2] / right[2] * 255;
+			Vec3b ans = { tmp0, tmp1, tmp2 };
+			images[idx1].at<Vec3b>(i, j) = ans;
+		}
+	}
 }
