@@ -11,6 +11,9 @@ miniPS::miniPS(QWidget *parent)
 	// Hide some components
 	ui.hsvWidget->setVisible(false);
 	ui.doubleThreshodWidget->setVisible(false);
+	ui.addWidget->setVisible(false);
+	ui.subtractionWidget->setVisible(false);
+
 
 	//init focused layer
 	focusedLayer = 0;
@@ -73,6 +76,15 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionOtus_Algo, SIGNAL(triggered()), this, SLOT(on_slotOtsu_trigged()));
 	connect(ui.actiondouble_threshod, SIGNAL(triggered()), this, SLOT(on_slotDbTh_trigged()));
 	connect(ui.doubleThreshodOkBtn, SIGNAL(clicked()), this, SLOT(on_slotDbThok_trigged()));
+	connect(ui.addBtn, SIGNAL(clicked()), this, SLOT(on_slotAdd_trigged()));
+	connect(ui.subtractionBtn, SIGNAL(clicked()), this, SLOT(on_slotSubtraction_trigged()));
+	connect(ui.multiplicationBtn, SIGNAL(clicked()), this, SLOT(on_slotMultiplication_trigged()));
+	connect(ui.divisionBtn, SIGNAL(clicked()), this, SLOT(on_slotDivision_trigged()));
+	connect(ui.addOkBtn, SIGNAL(clicked()), this, SLOT(on_addOk_trigged()));
+	connect(ui.substractionOkBtn, SIGNAL(clicked()), this, SLOT(on_subOk_trigged()));
+	//connect(ui.multiplicationOkBtn, SIGNAL(clicked()), this, SLOT(on_multiOk_trigged()));
+	//connect(ui.divisionOkBtn, SIGNAL(clicked()), this, SLOT(on_dvdOk_trigged()));
+
 	
 	
 	// Set shortcut for menu
@@ -518,4 +530,68 @@ void miniPS::on_slotOtsu_trigged() {
 	}
 	myProcessor.toBinary(true, 0, 0, focusedLayer);
 	refreshImg();
+}
+
+// When "add" button is pressed
+void miniPS::on_slotAdd_trigged() {
+	ui.addWidget->setVisible(true);
+}
+
+// When "sub" button is pressed
+void miniPS::on_slotSubtraction_trigged() {
+	ui.subtractionWidget->setVisible(true);
+}
+
+// When "multi" button is pressed
+void miniPS::on_slotMultiplication_trigged(){
+    
+}
+
+// When "dvd" button is pressed
+void miniPS::on_slotDivision_trigged() {
+
+}
+
+// Do add operation
+void miniPS::on_addOk_trigged() {
+	int idx1 = ui.inputAddImg1->value();
+	int idx2 = ui.inputAddImg2->value();
+	double weight1 = ui.inputAddWeight1->value();
+	double weight2 = ui.inputAddWeight2->value();
+	int posX = ui.inputAddX->value();
+	int posY = ui.inputAddY->value();
+	if (myViews[idx1]->scene() == NULL || myViews[idx2]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.addWidget->setVisible(false);
+		return;
+	}
+	myProcessor.addOper(idx1, idx2, weight1, weight2, posX, posY);
+	refreshImg();
+	ui.addWidget->setVisible(false);
+}
+
+// Do subtraction operation
+void miniPS::on_subOk_trigged() {
+	int idx1 = ui.inputSubImg1->value();
+	int idx2 = ui.inputSub2->value();
+	int posX = ui.inputSubX->value();
+	int posY = ui.inputSubY->value();
+	if (myViews[idx1]->scene() == NULL || myViews[idx2]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.subtractionWidget->setVisible(false);
+		return;
+	}
+	myProcessor.subtractionOper(idx1, idx2, posX, posY);
+	refreshImg();
+	ui.subtractionWidget->setVisible(false);
+}
+
+// Do multiplication operation
+void miniPS::on_multiOk_trigged() {
+
+}
+
+// Do division operation
+void miniPS::on_dvdOk_trigged() {
+
 }

@@ -253,3 +253,10 @@ int ImageProcessor::otsu(Mat img) {
 	}
 	return(thresholdValue);
 }
+
+void ImageProcessor::addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY) {
+
+}
+void ImageProcessor::subtractionOper(int idx1, int idx2, int posX, int posY) {
+
+}

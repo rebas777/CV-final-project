@@ -34,4 +34,6 @@ public:
 	void changeHSV(int hsvNum, int val, int idx);
 	void channelSplit(int rgbNum, int idx);
 	void toBinary(bool useOtsu, int th1, int th2, int idx);
+	void addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY);
+	void subtractionOper(int idx1, int idx2, int posX, int posY);
 };
