@@ -107,6 +107,7 @@ public:
     QPushButton *addBtn;
     QPushButton *subtractionBtn;
     QPushButton *multiplicationBtn;
+    QPushButton *spinBtn;
     QFrame *line_4;
     QFrame *line_6;
     QFrame *line_7;
@@ -432,6 +433,9 @@ public:
         multiplicationBtn = new QPushButton(leftToolBar);
         multiplicationBtn->setObjectName(QStringLiteral("multiplicationBtn"));
         multiplicationBtn->setGeometry(QRect(10, 210, 51, 34));
+        spinBtn = new QPushButton(leftToolBar);
+        spinBtn->setObjectName(QStringLiteral("spinBtn"));
+        spinBtn->setGeometry(QRect(70, 110, 51, 34));
         line_4 = new QFrame(centralWidget);
         line_4->setObjectName(QStringLiteral("line_4"));
         line_4->setGeometry(QRect(30, 60, 131, 20));
@@ -811,6 +815,7 @@ public:
         addBtn->setText(QApplication::translate("miniPSClass", "add", Q_NULLPTR));
         subtractionBtn->setText(QApplication::translate("miniPSClass", "sub", Q_NULLPTR));
         multiplicationBtn->setText(QApplication::translate("miniPSClass", "multi", Q_NULLPTR));
+        spinBtn->setText(QApplication::translate("miniPSClass", "spin", Q_NULLPTR));
         label_9->setText(QApplication::translate("miniPSClass", "H\357\274\232", Q_NULLPTR));
         label_10->setText(QApplication::translate("miniPSClass", "S\357\274\232", Q_NULLPTR));
         label_11->setText(QApplication::translate("miniPSClass", "V:", Q_NULLPTR));

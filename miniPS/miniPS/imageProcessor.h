@@ -42,4 +42,5 @@ public:
 	bool multiplicationOper(int idx1, int idx2);
 	bool divisionOper(int idx1, int idx2);
 	void resize(int width, int height, int choiceNum, int idx);
+	void spinCW(int idx);
 };

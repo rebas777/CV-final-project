@@ -89,6 +89,7 @@ miniPS::miniPS(QWidget *parent)
 	//connect(ui.divisionOkBtn, SIGNAL(clicked()), this, SLOT(on_dvdOk_trigged()));
 	connect(ui.actionresize, SIGNAL(triggered()), this, SLOT(on_slotResize_trigged()));
 	connect(ui.resizeOkBtn, SIGNAL(clicked()), this, SLOT(on_resizeOk_trigged()));
+	connect(ui.spinBtn, SIGNAL(clicked()), this, SLOT(on_slotSpin_trigged()));
 
 	
 	
@@ -662,4 +663,14 @@ void miniPS::on_resizeOk_trigged() {
 	}
 	refreshImg();
 	ui.resizeWidget->setVisible(false);
+}
+
+// Do spin PI/2 clockwize
+void miniPS::on_slotSpin_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.spinCW(focusedLayer);
+	refreshImg();
 }

@@ -370,3 +370,16 @@ void ImageProcessor::resize(int width, int height, int choiceNum, int idx) {
 	}
 	images[idx] = newImg;
 }
+
+void ImageProcessor::spinCW(int idx) {
+	commit(idx);
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	Mat newImg(iCols, iRows, images[idx].type());
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			newImg.at<Vec3b>(j, iRows -1 - i) = images[idx].at<Vec3b>(i,j);
+		}
+	}
+	images[idx] = newImg;
+}
