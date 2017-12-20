@@ -413,3 +413,36 @@ void ImageProcessor::drawHist(int channelNum, int idx) {
 	imshow("histogram", histImg);
 }
 
+void ImageProcessor::histEqualization(int idx) {
+	commit(idx);
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	Mat newImg(iCols, iRows, images[idx].type());
+	int rHist[256], gHist[256], bHist[256];
+	makeHist(rHist, CHANNEL_R, images[idx]);
+	makeHist(gHist, CHANNEL_G, images[idx]);
+	makeHist(bHist, CHANNEL_B, images[idx]);
+	int numberOfPixel = images[idx].rows*images[idx].cols;
+	int rLUT[256], gLUT[256], bLUT[256];
+	rLUT[0] = 1.0*rHist[0] / numberOfPixel * 255;
+	gLUT[0] = 1.0*gHist[0] / numberOfPixel * 255;
+	bLUT[0] = 1.0*bHist[0] / numberOfPixel * 255;
+	int rSum = rHist[0], gSum = gHist[0], bSum = bHist[0];
+	for (int i = 1; i < 256; i++) {
+		rSum += rHist[i];
+		rLUT[i] = 1.0 * rSum / numberOfPixel * 255;
+		gSum += gHist[i];
+		gLUT[i] = 1.0 * gSum / numberOfPixel * 255;
+		bSum += bHist[i];
+		bLUT[i] = 1.0 * bSum / numberOfPixel * 255;
+	}
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			Vec3b srcTmp = images[idx].at<Vec3b>(i, j), dstTmp;
+			dstTmp[0] = bLUT[srcTmp[0]];
+			dstTmp[1] = gLUT[srcTmp[1]];
+			dstTmp[2] = rLUT[srcTmp[2]];
+			images[idx].at<Vec3b>(i, j) = dstTmp;
+		}
+	}
+}

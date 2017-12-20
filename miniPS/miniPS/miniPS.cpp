@@ -93,6 +93,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionR_hist, SIGNAL(triggered()), this, SLOT(on_slotRHist_trigged()));
 	connect(ui.actionG_hist, SIGNAL(triggered()), this, SLOT(on_slotGHist_trigged()));
 	connect(ui.actionB_hist, SIGNAL(triggered()), this, SLOT(on_slotBHist_trigged()));
+	connect(ui.actionEqualization, SIGNAL(triggered()), this, SLOT(on_slotHistEqualization()));
 	
 	
 	// Set shortcut for menu
@@ -706,4 +707,14 @@ void miniPS::on_slotBHist_trigged() {
 		return;
 	}
 	myProcessor.drawHist(CHANNEL_B, focusedLayer);
+}
+
+// Do histogram equalization
+void miniPS::on_slotHistEqualization() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.histEqualization(focusedLayer);
+	refreshImg();
 }

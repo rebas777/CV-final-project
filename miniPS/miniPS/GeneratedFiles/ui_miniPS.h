@@ -55,6 +55,7 @@ public:
     QAction *actionR_hist;
     QAction *actionG_hist;
     QAction *actionB_hist;
+    QAction *actionEqualization;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -235,6 +236,8 @@ public:
         actionG_hist->setObjectName(QStringLiteral("actionG_hist"));
         actionB_hist = new QAction(miniPSClass);
         actionB_hist->setObjectName(QStringLiteral("actionB_hist"));
+        actionEqualization = new QAction(miniPSClass);
+        actionEqualization->setObjectName(QStringLiteral("actionEqualization"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -746,6 +749,7 @@ public:
         menudraw_histogram->addAction(actionR_hist);
         menudraw_histogram->addAction(actionG_hist);
         menudraw_histogram->addAction(actionB_hist);
+        menudraw_histogram->addAction(actionEqualization);
         menuSettings->addSeparator();
         menuSettings->addAction(menuWindow_mode->menuAction());
         menuWindow_mode->addAction(actionfull_screen);
@@ -790,6 +794,7 @@ public:
         actionR_hist->setText(QApplication::translate("miniPSClass", "R hist", Q_NULLPTR));
         actionG_hist->setText(QApplication::translate("miniPSClass", "G hist", Q_NULLPTR));
         actionB_hist->setText(QApplication::translate("miniPSClass", "B hist", Q_NULLPTR));
+        actionEqualization->setText(QApplication::translate("miniPSClass", "Equalization", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -875,7 +880,7 @@ public:
         menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
         menuchannel_split->setTitle(QApplication::translate("miniPSClass", "channel split", Q_NULLPTR));
         menubinary_analysis->setTitle(QApplication::translate("miniPSClass", "binary analysis", Q_NULLPTR));
-        menudraw_histogram->setTitle(QApplication::translate("miniPSClass", "draw histogram", Q_NULLPTR));
+        menudraw_histogram->setTitle(QApplication::translate("miniPSClass", "histogram", Q_NULLPTR));
         menuSettings->setTitle(QApplication::translate("miniPSClass", "Settings", Q_NULLPTR));
         menuWindow_mode->setTitle(QApplication::translate("miniPSClass", "window mode", Q_NULLPTR));
         menuHelp->setTitle(QApplication::translate("miniPSClass", "Help", Q_NULLPTR));

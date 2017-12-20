@@ -1716,11 +1716,12 @@
     </widget>
     <widget class="QMenu" name="menudraw_histogram">
      <property name="title">
-      <string>draw histogram</string>
+      <string>histogram</string>
      </property>
      <addaction name="actionR_hist"/>
      <addaction name="actionG_hist"/>
      <addaction name="actionB_hist"/>
+     <addaction name="actionEqualization"/>
     </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
@@ -1861,6 +1862,11 @@
   <action name="actionB_hist">
    <property name="text">
     <string>B hist</string>
+   </property>
+  </action>
+  <action name="actionEqualization">
+   <property name="text">
+    <string>Equalization</string>
    </property>
   </action>
  </widget>

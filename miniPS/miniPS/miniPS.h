@@ -91,4 +91,5 @@ void on_slotSpin_trigged();
 void on_slotRHist_trigged();
 void on_slotGHist_trigged();
 void on_slotBHist_trigged();
+void on_slotHistEqualization();
 };

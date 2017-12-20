@@ -47,4 +47,5 @@ public:
 	void resize(int width, int height, int choiceNum, int idx);
 	void spinCW(int idx);
 	void drawHist(int channelNum, int idx);
+	void histEqualization(int idx);
 };
