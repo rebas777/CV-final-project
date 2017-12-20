@@ -79,7 +79,7 @@ void ImageProcessor::channelSplit(int rgbNum, int idx) {
 			for (int k = 0; k < 3; k++) {
 				if (k == rgbNum)
 					continue;
-				images[idx].at<Vec3b>(i, j)[k] = images[idx].at<Vec3b>(i, j)[rgbNum];
+				images[idx].at<Vec3b>(i, j)[k] = images[idx].at<Vec3b>(i, j)[2-rgbNum];
 			}
 		}
 	}
@@ -144,7 +144,7 @@ void ImageProcessor::changeHSV(int hsvNum, int val, int idx) {
  */
 void ImageProcessor::makeHist(int *ihist, int channelNum, Mat img) {
 
-	memset(ihist, 0, sizeof(ihist));
+	memset(ihist, 0, sizeof(int)*256);
 	int iChannels = img.channels();
 	int iRows = img.rows;
 	int iCols = img.cols;
@@ -159,8 +159,8 @@ void ImageProcessor::makeHist(int *ihist, int channelNum, Mat img) {
 	else {  // RGB image
 		for (int i = 0; i < iRows; i++) {
 			for (int j = 0; j < iCols; j++) {
-				int tmp = img.at<Vec3b>(i, j)[2-channelNum];
-				ihist[tmp]++;
+				Vec3b tmp = img.at<Vec3b>(i, j);
+				ihist[tmp[2 - channelNum]]++;
 			}
 		}
 	}
@@ -383,3 +383,33 @@ void ImageProcessor::spinCW(int idx) {
 	}
 	images[idx] = newImg;
 }
+
+void ImageProcessor::drawHist(int channelNum, int idx) {
+	int ihist[256];
+	makeHist(ihist, channelNum, images[idx]);
+	Mat histImg = Mat::zeros(256, 512, CV_8UC3);
+	int maxHistVal = 0;
+	for (int k = 0; k < 256; k++) {
+		if (ihist[k] > maxHistVal) {
+			maxHistVal = ihist[k];
+		}
+	}
+	CvScalar color;
+	switch (channelNum) {
+	case CHANNEL_R:
+		color = CV_RGB(255, 0, 0);
+		break;
+	case CHANNEL_G:
+		color = CV_RGB(0, 255, 0);
+		break;
+	case CHANNEL_B:
+		color = CV_RGB(0, 0, 255);
+		break;
+	}
+	for (int i = 0; i < 512; i++) {
+		int drawVal = ihist[i/2] * 256 / maxHistVal;
+		line(histImg, Point(i, 256), Point(i, 256- drawVal), color);
+	}
+	imshow("histogram", histImg);
+}
+

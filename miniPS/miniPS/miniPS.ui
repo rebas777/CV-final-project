@@ -1714,11 +1714,20 @@
      <addaction name="actionOtus_Algo"/>
      <addaction name="actiondouble_threshod"/>
     </widget>
+    <widget class="QMenu" name="menudraw_histogram">
+     <property name="title">
+      <string>draw histogram</string>
+     </property>
+     <addaction name="actionR_hist"/>
+     <addaction name="actionG_hist"/>
+     <addaction name="actionB_hist"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
     <addaction name="menucolor_operation"/>
     <addaction name="menubinary_analysis"/>
     <addaction name="actionresize"/>
+    <addaction name="menudraw_histogram"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -1837,6 +1846,21 @@
   <action name="actionresize">
    <property name="text">
     <string>resize</string>
+   </property>
+  </action>
+  <action name="actionR_hist">
+   <property name="text">
+    <string>R hist</string>
+   </property>
+  </action>
+  <action name="actionG_hist">
+   <property name="text">
+    <string>G hist</string>
+   </property>
+  </action>
+  <action name="actionB_hist">
+   <property name="text">
+    <string>B hist</string>
    </property>
   </action>
  </widget>

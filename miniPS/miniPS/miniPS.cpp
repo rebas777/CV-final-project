@@ -90,7 +90,9 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionresize, SIGNAL(triggered()), this, SLOT(on_slotResize_trigged()));
 	connect(ui.resizeOkBtn, SIGNAL(clicked()), this, SLOT(on_resizeOk_trigged()));
 	connect(ui.spinBtn, SIGNAL(clicked()), this, SLOT(on_slotSpin_trigged()));
-
+	connect(ui.actionR_hist, SIGNAL(triggered()), this, SLOT(on_slotRHist_trigged()));
+	connect(ui.actionG_hist, SIGNAL(triggered()), this, SLOT(on_slotGHist_trigged()));
+	connect(ui.actionB_hist, SIGNAL(triggered()), this, SLOT(on_slotBHist_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -425,7 +427,7 @@ void miniPS::on_channelSplitR_trigged() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-	myProcessor.channelSplit(2, focusedLayer);
+	myProcessor.channelSplit(CHANNEL_R, focusedLayer);
 	refreshImg();
 }
 
@@ -435,7 +437,7 @@ void miniPS::on_channelSplitG_trigged() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-	myProcessor.channelSplit(1, focusedLayer);
+	myProcessor.channelSplit(CHANNEL_G, focusedLayer);
 	refreshImg();
 }
 
@@ -445,7 +447,7 @@ void miniPS::on_channelSplitB_trigged() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-	myProcessor.channelSplit(0, focusedLayer);
+	myProcessor.channelSplit(CHANNEL_B, focusedLayer);
 	refreshImg();
 }
 
@@ -641,6 +643,10 @@ void miniPS::on_slotResize_trigged() {
 
 // Do resize operation
 void miniPS::on_resizeOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	int height = ui.inputResizeHeight->value();
 	int width = ui.inputResizeWidth->value();
 	if (ui.inputChoiceNN->checkState() == Qt::Checked) {
@@ -673,4 +679,31 @@ void miniPS::on_slotSpin_trigged() {
 	}
 	myProcessor.spinCW(focusedLayer);
 	refreshImg();
+}
+
+// Draw R channel histogram
+void miniPS::on_slotRHist_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.drawHist(CHANNEL_R, focusedLayer);
+}
+
+// Draw G channel histogram
+void miniPS::on_slotGHist_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.drawHist(CHANNEL_G, focusedLayer);
+}
+
+// Draw B channel histogram
+void miniPS::on_slotBHist_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.drawHist(CHANNEL_B, focusedLayer);
 }

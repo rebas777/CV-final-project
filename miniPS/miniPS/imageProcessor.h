@@ -8,6 +8,9 @@
 
 #define NN 0
 #define LINEAR 1
+#define CHANNEL_R 0
+#define CHANNEL_G 1
+#define CHANNEL_B 2
 
 using namespace cv;
 
@@ -43,4 +46,5 @@ public:
 	bool divisionOper(int idx1, int idx2);
 	void resize(int width, int height, int choiceNum, int idx);
 	void spinCW(int idx);
+	void drawHist(int channelNum, int idx);
 };

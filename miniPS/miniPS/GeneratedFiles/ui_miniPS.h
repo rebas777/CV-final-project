@@ -52,6 +52,9 @@ public:
     QAction *actionOtus_Algo;
     QAction *actiondouble_threshod;
     QAction *actionresize;
+    QAction *actionR_hist;
+    QAction *actionG_hist;
+    QAction *actionB_hist;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -182,6 +185,7 @@ public:
     QMenu *menucolor_operation;
     QMenu *menuchannel_split;
     QMenu *menubinary_analysis;
+    QMenu *menudraw_histogram;
     QMenu *menuSettings;
     QMenu *menuWindow_mode;
     QMenu *menuHelp;
@@ -225,6 +229,12 @@ public:
         actiondouble_threshod->setObjectName(QStringLiteral("actiondouble_threshod"));
         actionresize = new QAction(miniPSClass);
         actionresize->setObjectName(QStringLiteral("actionresize"));
+        actionR_hist = new QAction(miniPSClass);
+        actionR_hist->setObjectName(QStringLiteral("actionR_hist"));
+        actionG_hist = new QAction(miniPSClass);
+        actionG_hist->setObjectName(QStringLiteral("actionG_hist"));
+        actionB_hist = new QAction(miniPSClass);
+        actionB_hist->setObjectName(QStringLiteral("actionB_hist"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -693,6 +703,8 @@ public:
         menuchannel_split->setObjectName(QStringLiteral("menuchannel_split"));
         menubinary_analysis = new QMenu(menuEdit);
         menubinary_analysis->setObjectName(QStringLiteral("menubinary_analysis"));
+        menudraw_histogram = new QMenu(menuEdit);
+        menudraw_histogram->setObjectName(QStringLiteral("menudraw_histogram"));
         menuSettings = new QMenu(menuBar);
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuWindow_mode = new QMenu(menuSettings);
@@ -722,6 +734,7 @@ public:
         menuEdit->addAction(menucolor_operation->menuAction());
         menuEdit->addAction(menubinary_analysis->menuAction());
         menuEdit->addAction(actionresize);
+        menuEdit->addAction(menudraw_histogram->menuAction());
         menucolor_operation->addAction(menuchannel_split->menuAction());
         menucolor_operation->addAction(actionRGB2GrayScale);
         menucolor_operation->addAction(actionHSB);
@@ -730,6 +743,9 @@ public:
         menuchannel_split->addAction(actionBlue);
         menubinary_analysis->addAction(actionOtus_Algo);
         menubinary_analysis->addAction(actiondouble_threshod);
+        menudraw_histogram->addAction(actionR_hist);
+        menudraw_histogram->addAction(actionG_hist);
+        menudraw_histogram->addAction(actionB_hist);
         menuSettings->addSeparator();
         menuSettings->addAction(menuWindow_mode->menuAction());
         menuWindow_mode->addAction(actionfull_screen);
@@ -771,6 +787,9 @@ public:
         actionOtus_Algo->setText(QApplication::translate("miniPSClass", "Otus Algo", Q_NULLPTR));
         actiondouble_threshod->setText(QApplication::translate("miniPSClass", "double threshod", Q_NULLPTR));
         actionresize->setText(QApplication::translate("miniPSClass", "resize", Q_NULLPTR));
+        actionR_hist->setText(QApplication::translate("miniPSClass", "R hist", Q_NULLPTR));
+        actionG_hist->setText(QApplication::translate("miniPSClass", "G hist", Q_NULLPTR));
+        actionB_hist->setText(QApplication::translate("miniPSClass", "B hist", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -856,6 +875,7 @@ public:
         menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
         menuchannel_split->setTitle(QApplication::translate("miniPSClass", "channel split", Q_NULLPTR));
         menubinary_analysis->setTitle(QApplication::translate("miniPSClass", "binary analysis", Q_NULLPTR));
+        menudraw_histogram->setTitle(QApplication::translate("miniPSClass", "draw histogram", Q_NULLPTR));
         menuSettings->setTitle(QApplication::translate("miniPSClass", "Settings", Q_NULLPTR));
         menuWindow_mode->setTitle(QApplication::translate("miniPSClass", "window mode", Q_NULLPTR));
         menuHelp->setTitle(QApplication::translate("miniPSClass", "Help", Q_NULLPTR));
