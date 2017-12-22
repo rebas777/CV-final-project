@@ -21,6 +21,7 @@ private:
 
 	int otsu(Mat img);
 	void makeHist(int *ihist, int channelNum, Mat img);
+	void bilinearInter(float x0, float y0, Mat img, int &rVal, int &gVal, int &bVal);
 	 
 public:
 
@@ -48,4 +49,5 @@ public:
 	void spinCW(int idx);
 	void drawHist(int channelNum, int idx);
 	void histEqualization(int idx);
+	void rotateCW(float theta, int choiceNum, int idx);
 };

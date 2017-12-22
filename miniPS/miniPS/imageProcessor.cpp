@@ -8,6 +8,7 @@ ImageProcessor::ImageProcessor() {
 }
 
 void ImageProcessor::loadImage(const char* name, int idx) {
+	// Default format: RGB
 	images[idx] = imread(name);
 }
 
@@ -348,14 +349,50 @@ bool ImageProcessor::divisionOper(int idx1, int idx2) {
 	}
 }
 
+void ImageProcessor::bilinearInter(float x0, float y0, Mat img, int &rVal, int &gVal, int &bVal) {
+	int iRows = img.rows, iCols = img.cols;
+	int x1, x2, y1, y2;
+	float w1, w2, w3, w4;
+	Vec3b p1, p2, p3, p4;
+	x1 = (int)x0;
+	y1 = (int)y0;
+	if (x1 < 0)
+		x1 = 0;
+	if (y1 < 0)
+		y1 = 0;
+	if (x1 == iCols - 1) {
+		x2 = x1;
+	}
+	else {
+		x2 = x1 + 1;
+	}
+	if (y1 == iRows - 1) {
+		y2 = y1;
+	}
+	else {
+		y2 = y1 + 1;
+	}
+	w1 = (x0 - x1)*(y0 - y1);
+	w2 = (x2 - x0)*(y0 - y1);
+	w3 = (x2 - x0)*(y2 - y0);
+	w4 = (x0 - x1)*(y2 - y0);
+	p1 = img.at<Vec3b>(y1, x1);
+	p2 = img.at<Vec3b>(y1, x2);
+	p3 = img.at<Vec3b>(y2, x2);
+	p4 = img.at<Vec3b>(y2, x1);
+	rVal = int(w1*p1[2] + w2*p2[2] + w3*p3[2] + w4*p4[2]);
+	gVal = int(w1*p1[1] + w2*p2[1] + w3*p3[1] + w4*p4[1]);
+	bVal = int(w1*p1[0] + w2*p2[0] + w3*p3[0] + w4*p4[0]);
+}
+
 void ImageProcessor::resize(int width, int height, int choiceNum, int idx) {
 	commit(idx);
 	Mat newImg(height, width, images[idx].type());
+	int srcHeight = images[idx].rows;
+	int srcWidth = images[idx].cols;
+	float hRate = (float)srcHeight / height;
+	float wRate = (float)srcWidth / width;
 	if (choiceNum == NN) { // Use NN
-		int srcHeight = images[idx].rows;
-		int srcWidth = images[idx].cols;
-		float hRate = (float)srcHeight / height;
-		float wRate = (float)srcWidth / width;
 		int srcX, srcY;
 		for (int i = 0; i < height; i++) {
 			srcY = int(i * hRate);
@@ -366,7 +403,18 @@ void ImageProcessor::resize(int width, int height, int choiceNum, int idx) {
 		}
 	}
 	else if(choiceNum == LINEAR){ // Use LINEAR
-	
+		float srcX0, srcY0;
+		int rVal, gVal, bVal;
+		Vec3b pVal = { 0,0,0 };
+		for (int i = 0; i < height; i++) {
+			srcY0 = (i * hRate);
+			for (int j = 0; j < width; j++) {
+				srcX0 = (j * wRate);
+				bilinearInter(srcX0, srcY0, images[idx], rVal, gVal, bVal);
+				pVal[0] = bVal;  pVal[1] = gVal; pVal[2] = rVal;
+				newImg.at<Vec3b>(i, j) = pVal;
+			}
+		}
 	}
 	images[idx] = newImg;
 }
@@ -445,4 +493,79 @@ void ImageProcessor::histEqualization(int idx) {
 			images[idx].at<Vec3b>(i, j) = dstTmp;
 		}
 	}
+}
+
+void ImageProcessor::rotateCW(float theta, int choiceNum, int idx) {
+	commit(idx);
+	Mat imgOut;
+	int oldWidth = images[idx].cols;
+	int oldHeight = images[idx].rows;
+ 
+	float fSrcX1, fSrcY1, fSrcX2, fSrcY2, fSrcX3, fSrcY3, fSrcX4, fSrcY4;
+	fSrcX1 = (float)(-(oldWidth - 1) / 2);
+	fSrcY1 = (float)((oldHeight - 1) / 2);
+	fSrcX2 = (float)((oldWidth - 1) / 2);
+	fSrcY2 = (float)((oldHeight - 1) / 2);
+	fSrcX3 = (float)(-(oldWidth - 1) / 2);
+	fSrcY3 = (float)(-(oldHeight - 1) / 2);
+	fSrcX4 = (float)((oldWidth - 1) / 2);
+	fSrcY4 = (float)(-(oldHeight - 1) / 2);
+
+	float fDstX1, fDstY1, fDstX2, fDstY2, fDstX3, fDstY3, fDstX4, fDstY4;
+	fDstX1 = cos(theta) * fSrcX1 + sin(theta) * fSrcY1;
+	fDstY1 = -sin(theta) * fSrcX1 + cos(theta) * fSrcY1;
+	fDstX2 = cos(theta) * fSrcX2 + sin(theta) * fSrcY2;
+	fDstY2 = -sin(theta) * fSrcX2 + cos(theta) * fSrcY2;
+	fDstX3 = cos(theta) * fSrcX3 + sin(theta) * fSrcY3;
+	fDstY3 = -sin(theta) * fSrcX3 + cos(theta) * fSrcY3;
+	fDstX4 = cos(theta) * fSrcX4 + sin(theta) * fSrcY4;
+	fDstY4 = -sin(theta) * fSrcX4 + cos(theta) * fSrcY4;
+
+	int newWidth = (max(fabs(fDstX4 - fDstX1), fabs(fDstX3 - fDstX2)) + 0.5);
+	int newHeight = (max(fabs(fDstY4 - fDstY1), fabs(fDstY3 - fDstY2)) + 0.5);
+
+	imgOut.create(newHeight, newWidth, images[idx].type());
+
+	float dx = -0.5*newWidth*cos(theta) - 0.5*newHeight*sin(theta) + 0.5*oldWidth;
+	float dy = 0.5*newWidth*sin(theta) - 0.5*newHeight*cos(theta) + 0.5*oldHeight;
+
+	int x, y;
+	for (int i = 0; i<newHeight; i++)
+	{
+		for (int j = 0; j<newWidth; j++)
+		{
+			x = float(j)*cos(theta) + float(i)*sin(theta) + dx;
+			y = float(-j)*sin(theta) + float(i)*cos(theta) + dy;
+
+			if ((x<0) || (x >= oldWidth) || (y<0) || (y >= oldHeight))
+			{
+				if (images[idx].channels() == 3)
+				{
+					imgOut.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0);
+				}
+				else if (images[idx].channels() == 1)
+				{
+					imgOut.at<uchar>(i, j) = 0;
+				}
+			}
+			else
+			{
+				if (choiceNum == LINEAR) { // Use BILINEAR
+					int rVal, gVal, bVal;
+					bilinearInter(x, y, images[idx], rVal, gVal, bVal);
+					Vec3b pVal = { 0,0,0 };
+					pVal[0] = bVal; pVal[1] = gVal; pVal[2] = rVal;
+					imgOut.at<cv::Vec3b>(i, j) = pVal;
+				}
+				else { // Use NN
+					imgOut.at<cv::Vec3b>(i, j) = images[idx].at<cv::Vec3b>(y, x);
+				}
+				/*if (images[idx].channels() == 3)
+				{
+					imgOut.at<cv::Vec3b>(i, j) = images[idx].at<cv::Vec3b>(y, x);
+				}*/
+			}
+		}
+	}
+	images[idx] = imgOut;
 }

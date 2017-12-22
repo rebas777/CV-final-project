@@ -92,4 +92,8 @@ void on_slotRHist_trigged();
 void on_slotGHist_trigged();
 void on_slotBHist_trigged();
 void on_slotHistEqualization();
+void on_slotFilter_trigged();
+void on_filterOk_trigged();
+void on_slotRotate_trigged();
+void on_rotateOk_trigged();
 };

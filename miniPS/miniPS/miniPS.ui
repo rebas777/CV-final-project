@@ -1665,6 +1665,198 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="filterWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_34">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Filter:</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputFilterChoiceBox">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>70</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Box</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputFilterChoiceMid">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputFilterChoiceGaussian">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>150</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_35">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>70</y>
+        <width>111</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Kernel Size:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="inputKernelSize">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>70</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <number>25</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="filterOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>140</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="rotateWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_36">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Rotate:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputRotateTheta">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>80</y>
+        <width>76</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <double>359.990000000000009</double>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_37">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>80</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Theta:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="rotateOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>160</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputRotateChoiceNN">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>130</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NN</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputRotateChoiceLINEAR">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>130</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>LINEAR</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -1729,6 +1921,8 @@
     <addaction name="menubinary_analysis"/>
     <addaction name="actionresize"/>
     <addaction name="menudraw_histogram"/>
+    <addaction name="actionfilter"/>
+    <addaction name="actionrotate"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -1867,6 +2061,16 @@
   <action name="actionEqualization">
    <property name="text">
     <string>Equalization</string>
+   </property>
+  </action>
+  <action name="actionfilter">
+   <property name="text">
+    <string>filter</string>
+   </property>
+  </action>
+  <action name="actionrotate">
+   <property name="text">
+    <string>rotate</string>
    </property>
   </action>
  </widget>

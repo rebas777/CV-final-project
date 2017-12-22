@@ -16,7 +16,8 @@ miniPS::miniPS(QWidget *parent)
 	ui.multiplicationWidget->setVisible(false);
 	ui.divisionWidget->setVisible(false);
 	ui.resizeWidget->setVisible(false);
-
+	ui.filterWidget->setVisible(false);
+	ui.rotateWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
@@ -94,6 +95,10 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionG_hist, SIGNAL(triggered()), this, SLOT(on_slotGHist_trigged()));
 	connect(ui.actionB_hist, SIGNAL(triggered()), this, SLOT(on_slotBHist_trigged()));
 	connect(ui.actionEqualization, SIGNAL(triggered()), this, SLOT(on_slotHistEqualization()));
+	connect(ui.actionfilter, SIGNAL(triggered()), this, SLOT(on_slotFilter_trigged()));
+	connect(ui.filterOkBtn, SIGNAL(clicked()), this, SLOT(on_filterOk_trigged()));
+	connect(ui.actionrotate, SIGNAL(triggered()), this, SLOT(on_slotRotate_trigged()));
+	connect(ui.rotateOkBtn, SIGNAL(clicked()), this, SLOT(on_rotateOk_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -646,6 +651,7 @@ void miniPS::on_slotResize_trigged() {
 void miniPS::on_resizeOk_trigged() {
 	if (myViews[focusedLayer]->scene() == NULL) {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.resizeWidget->setVisible(false);
 		return;
 	}
 	int height = ui.inputResizeHeight->value();
@@ -717,4 +723,67 @@ void miniPS::on_slotHistEqualization() {
 	}
 	myProcessor.histEqualization(focusedLayer);
 	refreshImg();
+}
+
+// When "filter" button is pressed
+void miniPS::on_slotFilter_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.filterWidget->setVisible(true);
+}
+
+// Do filter operation
+void miniPS::on_filterOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.filterWidget->setVisible(false);
+		return;
+	}
+	//
+	refreshImg();
+	ui.filterWidget->setVisible(false);
+}
+
+// When "rotate" button is pressed
+void miniPS::on_slotRotate_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.rotateWidget->setVisible(true);
+}
+
+// Do rotate operation
+void miniPS::on_rotateOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	float theta = ui.inputRotateTheta->value();
+	if (theta == 0) {
+		return;
+	}
+	//myProcessor.rotateCW(theta, focusedLayer);
+	if (ui.inputRotateChoiceNN->checkState() == Qt::Checked) {
+		if (ui.inputRotateChoiceLINEAR->checkState() == Qt::Checked) {// Both are checked
+			QMessageBox::about(NULL, "Oooops", "You can only check one choice");
+			ui.resizeWidget->setVisible(false);
+			return;
+		}
+		else {// use NN
+			myProcessor.rotateCW(theta, NN, focusedLayer);
+		}
+	}
+	else if (ui.inputRotateChoiceLINEAR->checkState() == Qt::Checked) {// use LINEAR
+		myProcessor.rotateCW(theta, LINEAR, focusedLayer);
+	}
+	else {// None are checked
+		QMessageBox::about(NULL, "Oooops", "You must take one choice");
+		ui.resizeWidget->setVisible(false);
+		return;
+	}
+	refreshImg();
+	ui.rotateWidget->setVisible(false);
 }
