@@ -18,6 +18,8 @@ miniPS::miniPS(QWidget *parent)
 	ui.resizeWidget->setVisible(false);
 	ui.filterWidget->setVisible(false);
 	ui.rotateWidget->setVisible(false);
+	ui.GSAWidget->setVisible(false);
+	ui.UGSAWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
@@ -99,6 +101,14 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.filterOkBtn, SIGNAL(clicked()), this, SLOT(on_filterOk_trigged()));
 	connect(ui.actionrotate, SIGNAL(triggered()), this, SLOT(on_slotRotate_trigged()));
 	connect(ui.rotateOkBtn, SIGNAL(clicked()), this, SLOT(on_rotateOk_trigged()));
+	connect(ui.actionlinear, SIGNAL(triggered()), this, SLOT(on_slotGSALinear_trigged()));
+	connect(ui.GSALinearOkBtn, SIGNAL(clicked()), this, SLOT(on_GSAOk_trigged()));
+	connect(ui.GSASliderA, SIGNAL(valueChanged(int)), this, SLOT(on_GSALinearSlid(int)));
+	connect(ui.GSASliderB, SIGNAL(valueChanged(int)), this, SLOT(on_GSALinearSlid(int)));
+	connect(ui.GSASliderC, SIGNAL(valueChanged(int)), this, SLOT(on_GSALinearSlid(int)));
+	connect(ui.GSASliderD, SIGNAL(valueChanged(int)), this, SLOT(on_GSALinearSlid(int)));
+	connect(ui.UGSAOkBtn, SIGNAL(clicked()), this, SLOT(on_UGSAOk_trigged()));
+	connect(ui.actionexp_log, SIGNAL(triggered()), this, SLOT(on_slotGSAExpLog_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -113,6 +123,20 @@ miniPS::miniPS(QWidget *parent)
 	ui.horizontalSlider->setSingleStep(ZOOM_STEP);
 	ui.horizontalSlider->setTickInterval(50);
 	ui.horizontalSlider->setTickPosition(QSlider::TicksAbove);
+
+	// Set GSA linear dslider
+	ui.GSASliderA->setMaximum(254);
+	ui.GSASliderA->setMinimum(1);
+	ui.GSASliderA->setSingleStep(10);
+	ui.GSASliderB->setMaximum(254);
+	ui.GSASliderB->setMinimum(1);
+	ui.GSASliderB->setSingleStep(10);
+	ui.GSASliderC->setMaximum(254);
+	ui.GSASliderC->setMinimum(1);
+	ui.GSASliderC->setSingleStep(10);
+	ui.GSASliderD->setMaximum(254);
+	ui.GSASliderD->setMinimum(1);
+	ui.GSASliderD->setSingleStep(10);
 
 	// Set HSV slider
 	ui.horizontalSlider_h->setOrientation(Qt::Horizontal);
@@ -492,23 +516,39 @@ void miniPS::on_slotHSV_trigged() {
 
 // When "HSV ok" button is pressed(hide hsv info)
 void miniPS::on_slotHSVok_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	ui.hsvWidget->setVisible(false);
 }
 
 // When HSV slider h is touched
 void miniPS::on_slotHSVslidH_trigged(int cur) {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.changeHSV(0, cur, focusedLayer);
 	refreshImg();
 }
 
 // When HSV slider s is touched
 void miniPS::on_slotHSVslidS_trigged(int cur) {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.changeHSV(1, cur, focusedLayer);
 	refreshImg();
 }
 
 // When HSV slider v is touched
 void miniPS::on_slotHSVslidV_trigged(int cur) {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
 	myProcessor.changeHSV(2, cur, focusedLayer);
 	refreshImg();
 }
@@ -786,4 +826,130 @@ void miniPS::on_rotateOk_trigged() {
 	}
 	refreshImg();
 	ui.rotateWidget->setVisible(false);
+}
+
+// When "grayscale adjustment->linear" button is pressed
+void miniPS::on_slotGSALinear_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.GSAWidget->setVisible(true);
+	myProcessor.commit(focusedLayer);
+	myProcessor.makeGSABackup(focusedLayer);
+	ui.GSASliderA->setValue(127);
+	ui.GSASliderB->setValue(127);
+	ui.GSASliderC->setValue(127);
+	ui.GSASliderD->setValue(127);
+}
+
+// When any of GSA linear sliders is touched
+void miniPS::on_GSALinearSlid(int cur) {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		return;
+	}
+	int A, B, C, D;
+	int a, b, c, d;
+	A = ui.GSASliderA->value();
+	B = ui.GSASliderB->value();
+	C = ui.GSASliderC->value();
+	D = ui.GSASliderD->value();
+	if (A > B) {  // make sure a < b
+		a = B;
+		b = A;
+	}
+	else {
+		a = A;
+		b = B;
+	}
+	if (C > D) {  // make sure c < d
+		c = D;
+		d = C;
+	}
+	else {
+		c = C;
+		d = D;
+	}
+
+	// call paint event and draw function picture in real-time
+	
+	Mat functionDisplay = myProcessor.drawLinearFunction(a, b, c, d);
+	QImage tmp = cvMat2QImage(functionDisplay);
+	ui.label_40->setPixmap(QPixmap::fromImage(tmp));
+
+	// check choice and call GSA function
+	if (ui.inputLinearGSAChoiceRGB->checkState() == Qt::Checked) { // RGB
+		myProcessor.linearGSA(a, b, c, d, CHANNEL_R, focusedLayer);
+		myProcessor.linearGSA(a, b, c, d, CHANNEL_G, focusedLayer);
+		myProcessor.linearGSA(a, b, c, d, CHANNEL_B, focusedLayer);
+	}
+	else {
+		if (ui.inputLinearGSAChoiceR->checkState() == Qt::Checked) { // only R
+			myProcessor.linearGSA(a, b, c, d, CHANNEL_R, focusedLayer);
+		}
+		if (ui.inputLinearGSAChoiceG->checkState() == Qt::Checked) {  // only G
+			myProcessor.linearGSA(a, b, c, d, CHANNEL_G, focusedLayer);
+		}
+		if (ui.inputLinearGSAChoiceB->checkState() == Qt::Checked) {  // only B
+			myProcessor.linearGSA(a, b, c, d, CHANNEL_B, focusedLayer);
+		}
+	}
+
+	refreshImg();
+}
+
+// When any of "GSA OK" buttons is pressed
+void miniPS::on_GSAOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.GSAWidget->setVisible(false);
+}
+
+// When "grayscale adjustment->exp/log" button is pressed
+void miniPS::on_slotGSAExpLog_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.UGSAWidget->setVisible(true);
+}
+
+// Do exp/log GSA
+void miniPS::on_UGSAOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.UGSAWidget->setVisible(false);
+		return;
+	}
+	double A = ui.inputUGSAA->value();
+	double B = ui.inputUGSAB->value();
+	double C = ui.inputUGSAC->value();
+	if (ui.inputUGSAexp->checkState() == Qt::Checked) {
+		if (ui.inputUGSAlog->checkState() == Qt::Checked) {
+			QMessageBox::about(NULL, "Oooops", "You can only check one choice");
+			ui.UGSAWidget->setVisible(false);
+			return;
+		}
+		else { // exp
+			myProcessor.expGSA(A, B, C, CHANNEL_R, focusedLayer);
+			myProcessor.expGSA(A, B, C, CHANNEL_G, focusedLayer);
+			myProcessor.expGSA(A, B, C, CHANNEL_B, focusedLayer);
+		}
+	}
+	else {
+		if (ui.inputUGSAlog->checkState() == Qt::Checked) { // log
+			myProcessor.logGSA(A, B, C, CHANNEL_R, focusedLayer);
+			myProcessor.logGSA(A, B, C, CHANNEL_G, focusedLayer);
+			myProcessor.logGSA(A, B, C, CHANNEL_B, focusedLayer);
+		}
+		else {
+			QMessageBox::about(NULL, "Oooops", "You must take one choice");
+			ui.UGSAWidget->setVisible(false);
+			return;
+		}
+	}
+	refreshImg();
+	ui.UGSAWidget->setVisible(false);
 }

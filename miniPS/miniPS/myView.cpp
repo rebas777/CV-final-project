@@ -14,14 +14,6 @@ void MyView::setParentUI(Ui::miniPSClass  &parent) {
 }
 
 
-//MyScene MyView::getChild() {
-//	return child_scene;
-//}
-//
-//void MyView::setChild(const MyScene &scene) {
-//	child_scene = scene;
-//}
-
 void MyView::zoomInOut(float scale)
 {
 	if (scaleVal <= 0.2 && scale < 1) {
@@ -112,13 +104,6 @@ void MyView::mouseReleaseEvent(QMouseEvent *event)
 void MyView::paintEvent(QPaintEvent *event)
 {
 	if (mode == 1) {
-		/*MyScene *child = (MyScene *)this->scene();
-		child->m_painter.begin(m_pixmap);
-		child->m_painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine, Qt::FlatCap));
-		qDebug("fucking paint !!!!");
-		child->m_painter.drawRect(child->getRect(child->m_beginPoint.toPoint(),child->m_endPoint.toPoint()));
-		child->m_painter.end();*/
-
 		//TODO: make painted rectangle above the picture !
 		m_painter.begin(this->viewport());
 		QPoint beginPoint, endPoint;

@@ -1856,6 +1856,358 @@
        <string>LINEAR</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_38">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>80</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>rad</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="GSAWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>411</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_39">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>40</y>
+        <width>311</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Grayscale adjustment:  linear</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="GSASliderD">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>80</y>
+        <width>22</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="GSASliderC">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>80</y>
+        <width>22</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="GSASliderA">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>320</y>
+        <width>241</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="GSASliderB">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>350</y>
+        <width>241</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_40">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>60</y>
+        <width>256</width>
+        <height>256</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Display Label</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="GSALinearOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>370</y>
+        <width>141</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_41">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>310</y>
+        <width>16</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>D</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_42">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>310</y>
+        <width>16</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>C</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_43">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>320</y>
+        <width>16</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>A</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_44">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>350</y>
+        <width>16</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputLinearGSAChoiceRGB">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>70</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>RGB</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputLinearGSAChoiceR">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>110</y>
+        <width>61</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>R</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputLinearGSAChoiceG">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>150</y>
+        <width>71</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputLinearGSAChoiceB">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>190</y>
+        <width>61</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="UGSAWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>311</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_45">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>281</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Grayscale adjustment: exp/log</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_46">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>80</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>A:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_47">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>130</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>B:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_48">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>180</y>
+        <width>31</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>C:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputUGSAA">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>80</y>
+        <width>76</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputUGSAB">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>130</y>
+        <width>76</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputUGSAC">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>180</y>
+        <width>76</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>1.500000000000000</double>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputUGSAexp">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>80</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>exp</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="inputUGSAlog">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>130</y>
+        <width>105</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>log</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="UGSAOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>230</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -1915,6 +2267,13 @@
      <addaction name="actionB_hist"/>
      <addaction name="actionEqualization"/>
     </widget>
+    <widget class="QMenu" name="menugrayscale_adjustment">
+     <property name="title">
+      <string>grayscale adjustment</string>
+     </property>
+     <addaction name="actionlinear"/>
+     <addaction name="actionexp_log"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
     <addaction name="menucolor_operation"/>
@@ -1923,6 +2282,7 @@
     <addaction name="menudraw_histogram"/>
     <addaction name="actionfilter"/>
     <addaction name="actionrotate"/>
+    <addaction name="menugrayscale_adjustment"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -2071,6 +2431,21 @@
   <action name="actionrotate">
    <property name="text">
     <string>rotate</string>
+   </property>
+  </action>
+  <action name="actionlinear">
+   <property name="text">
+    <string>linear</string>
+   </property>
+  </action>
+  <action name="actionexp_log">
+   <property name="text">
+    <string>exp/log</string>
+   </property>
+  </action>
+  <action name="actionlogarithm">
+   <property name="text">
+    <string>logarithm</string>
    </property>
   </action>
  </widget>

@@ -28,6 +28,7 @@ public:
 	std::vector<Mat> images;
     std::vector<Mat> imageBackups;
 	Mat hsvBackup;
+	Mat GSABackup;
 
 	ImageProcessor();
 	void loadImage(const char *name, int idx);
@@ -50,4 +51,10 @@ public:
 	void drawHist(int channelNum, int idx);
 	void histEqualization(int idx);
 	void rotateCW(float theta, int choiceNum, int idx);
+	void linearGSA(int A, int B, int C, int D, int channelNum, int idx);
+	void expGSA(int A, int B, int C, int channelNum, int idx);
+	void logGSA(int A, int B, int C, int channelNum, int idx);
+	void makeGSABackup(int idx);
+	Mat drawLinearFunction(int a, int b, int c, int d);
+
 };

@@ -539,14 +539,7 @@ void ImageProcessor::rotateCW(float theta, int choiceNum, int idx) {
 
 			if ((x<0) || (x >= oldWidth) || (y<0) || (y >= oldHeight))
 			{
-				if (images[idx].channels() == 3)
-				{
-					imgOut.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0);
-				}
-				else if (images[idx].channels() == 1)
-				{
-					imgOut.at<uchar>(i, j) = 0;
-				}
+				imgOut.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255);
 			}
 			else
 			{
@@ -560,12 +553,88 @@ void ImageProcessor::rotateCW(float theta, int choiceNum, int idx) {
 				else { // Use NN
 					imgOut.at<cv::Vec3b>(i, j) = images[idx].at<cv::Vec3b>(y, x);
 				}
-				/*if (images[idx].channels() == 3)
-				{
-					imgOut.at<cv::Vec3b>(i, j) = images[idx].at<cv::Vec3b>(y, x);
-				}*/
 			}
 		}
 	}
 	images[idx] = imgOut;
+}
+
+void ImageProcessor::linearGSA(int A, int B, int C, int D, int channelNum, int idx) {
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			Vec3b tmp = GSABackup.at<Vec3b>(i, j);
+			//Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			int value = tmp[2 - channelNum];
+			if (value >= B) {
+				value = (value - B)*(255 - D) / (255 - B) + D;
+			}
+			else if (value >= A && value < B) {
+				value = (value - A)*(D - C) / (B - A) + C;
+			}
+			else {
+				value = value * C / A;
+			}
+			tmp[2 - channelNum] = value;
+			images[idx].at<Vec3b>(i, j) = tmp;
+		}
+	}
+}
+
+void ImageProcessor::expGSA(int A, int B, int C, int channelNum, int idx) {
+	commit(idx);
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			double value = tmp[2 - channelNum]*1.00;
+			value = pow(B, (C*(value - A))) - 1;
+			tmp[2 - channelNum] =(int)value;
+			images[idx].at<Vec3b>(i, j) = tmp;
+		}
+	}
+}
+
+void ImageProcessor::logGSA(int A, int B, int C, int channelNum, int idx) {
+	commit(idx);
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			double value = tmp[2 - channelNum] * 1.00;
+			value = A + (log(value + 1)) / (B*log(C));
+			tmp[2 - channelNum] = (int)value;
+			images[idx].at<Vec3b>(i, j) = tmp;
+		}
+	}
+}
+
+void ImageProcessor::makeGSABackup(int idx) {
+	GSABackup = images[idx].clone();
+}
+
+Mat ImageProcessor::drawLinearFunction(int A, int B, int C, int D) {
+	Mat res = Mat::zeros(256,  256, CV_8UC3);
+	CvScalar color = CV_RGB(0, 255, 0);
+	int y;
+	for (int x = 0; x < 255; x++) {
+		if (x >= B) {
+			y = (x - B)*(255 - B) / (255 - D) + D;
+		}
+		else if (x >= A && x < B) {
+			y = (x - A)*(D - C) / (B - A) + C;
+		}
+		else {
+			y = x * C / A;
+		}
+		Point p(x, 256-y);
+		circle(res, p, 2, color);
+	}
+	return res;
 }

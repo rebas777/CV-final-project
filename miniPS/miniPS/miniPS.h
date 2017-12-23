@@ -7,6 +7,7 @@
 #include "QFileDialog"
 #include "QMessageBox"
 #include "imageProcessor.h"
+#include "myImageLabel.h"
 
 #define NLAYERS 5
 #define ZOOM_IN_RATE 1.2
@@ -96,4 +97,9 @@ void on_slotFilter_trigged();
 void on_filterOk_trigged();
 void on_slotRotate_trigged();
 void on_rotateOk_trigged();
+void on_slotGSALinear_trigged();
+void on_slotGSAExpLog_trigged();
+void on_GSALinearSlid(int cur);
+void on_GSAOk_trigged();
+void on_UGSAOk_trigged();
 };
