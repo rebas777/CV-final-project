@@ -33,6 +33,9 @@ public:
 
 private:
 	Ui::miniPSClass ui;
+	double **sobelX;
+	double **sobelY;
+	double **laplace;
 
 	// Which layer are the user looking at
 	int focusedLayer;
@@ -95,6 +98,8 @@ void on_slotBHist_trigged();
 void on_slotHistEqualization();
 void on_slotFilter_trigged();
 void on_filterOk_trigged();
+void on_selfFilter_trigged();
+void on_selfFilterOk_trigged();
 void on_slotRotate_trigged();
 void on_rotateOk_trigged();
 void on_slotGSALinear_trigged();
@@ -102,4 +107,9 @@ void on_slotGSAExpLog_trigged();
 void on_GSALinearSlid(int cur);
 void on_GSAOk_trigged();
 void on_UGSAOk_trigged();
+void on_slotSobelX_trigged();
+void on_slotSobelY_trigged();
+void on_slotSobelXY_trigged();
+void on_slotLaplace_trigged();
+void on_slotCanny_trigged();
 };

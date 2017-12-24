@@ -1,4 +1,5 @@
 #include "imageProcessor.h"
+#include <algorithm>
 
 
 ImageProcessor::ImageProcessor() {
@@ -246,7 +247,6 @@ int ImageProcessor::otsu(Mat img) {
 		m1 = csum / n1;
 		m2 = (sum - csum) / n2;
 		sb = (double)n1 *(double)n2 *(m1 - m2) * (m1 - m2);
-		/**//* bbg: note: can be optimized. */
 		if (sb > fmax) {
 			fmax = sb;
 			thresholdValue = k;
@@ -584,7 +584,6 @@ void ImageProcessor::linearGSA(int A, int B, int C, int D, int channelNum, int i
 }
 
 void ImageProcessor::expGSA(int A, int B, int C, int channelNum, int idx) {
-	commit(idx);
 	int iRows = images[idx].rows;
 	int iCols = images[idx].cols;
 
@@ -593,6 +592,10 @@ void ImageProcessor::expGSA(int A, int B, int C, int channelNum, int idx) {
 			Vec3b tmp = images[idx].at<Vec3b>(i, j);
 			double value = tmp[2 - channelNum]*1.00;
 			value = pow(B, (C*(value - A))) - 1;
+			if (value > 255)
+				value = 255;
+			if (value < 0)
+				value = 0;
 			tmp[2 - channelNum] =(int)value;
 			images[idx].at<Vec3b>(i, j) = tmp;
 		}
@@ -600,7 +603,6 @@ void ImageProcessor::expGSA(int A, int B, int C, int channelNum, int idx) {
 }
 
 void ImageProcessor::logGSA(int A, int B, int C, int channelNum, int idx) {
-	commit(idx);
 	int iRows = images[idx].rows;
 	int iCols = images[idx].cols;
 
@@ -609,6 +611,10 @@ void ImageProcessor::logGSA(int A, int B, int C, int channelNum, int idx) {
 			Vec3b tmp = images[idx].at<Vec3b>(i, j);
 			double value = tmp[2 - channelNum] * 1.00;
 			value = A + (log(value + 1)) / (B*log(C));
+			if (value > 255)
+				value = 255;
+			if (value < 0)
+				value = 0;
 			tmp[2 - channelNum] = (int)value;
 			images[idx].at<Vec3b>(i, j) = tmp;
 		}
@@ -637,4 +643,325 @@ Mat ImageProcessor::drawLinearFunction(int A, int B, int C, int D) {
 		circle(res, p, 2, color);
 	}
 	return res;
+}
+
+void ImageProcessor::filter2D(double **kernel, int ksize, int idx) {  // 卷积函数(默认 anchor 在卷积核中间)
+	commit(idx);
+	Mat newImg = images[idx].clone();
+	int iRows = newImg.rows;
+	int iCols = newImg.cols;
+	for (int i = ksize / 2; i < iRows - ksize / 2; i++) {
+		for (int j = ksize / 2; j < iCols - ksize / 2; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			double rVal = 0, gVal = 0, bVal = 0;
+			for (int m = 0; m < ksize; m++) {
+				for (int n = 0; n < ksize; n++) {
+					int i_t = i - (ksize / 2) + m;
+					int j_t = j - (ksize / 2) + n;
+					Vec3b tmp1 = images[idx].at<Vec3b>(i_t, j_t);
+					rVal += kernel[m][n] * tmp1[2];
+					gVal += kernel[m][n] * tmp1[1];
+					bVal += kernel[m][n] * tmp1[0];
+				}
+			}
+			if (rVal < 0)
+				rVal = 0;
+			if (gVal < 0)
+				gVal = 0;
+			if (bVal < 0)
+				bVal = 0;
+			if (rVal > 255)
+				rVal = 255;
+			if (gVal > 255)
+				gVal = 255;
+			if (bVal > 255)
+				bVal = 255;
+			tmp[0] = bVal;
+			tmp[1] = gVal;
+			tmp[2] = rVal;
+			newImg.at<Vec3b>(i, j) = tmp;
+		}
+	}
+	images[idx] = newImg;
+}
+
+void ImageProcessor::boxFilter(int ksize, int idx) {
+	double val = 1.0 / (ksize*ksize);
+	double **kernel;
+	kernel = (double **)malloc(ksize * sizeof(double*));
+	for (int i = 0; i < ksize; i++) {
+		kernel[i] = (double *)malloc(ksize * sizeof(double));
+		for (int j = 0; j < ksize; j++) {
+			kernel[i][j] = val;
+		}
+	}
+	filter2D(kernel, ksize, idx);
+	for (int i = 0; i < ksize; i++) {
+		delete kernel[i];
+	}
+	delete kernel;
+}
+
+void getGaussianKernel(double **gaus, const int size, const double sigma)
+{
+	const double PI = 4.0*atan(1.0);
+	int center = size / 2;
+	double sum = 0;
+	for (int i = 0; i<size; i++)
+	{
+		for (int j = 0; j<size; j++)
+		{
+			gaus[i][j] = (1 / (2 * PI*sigma*sigma))*exp(-((i - center)*(i - center) + (j - center)*(j - center)) / (2 * sigma*sigma));
+			sum += gaus[i][j];
+		}
+	}
+
+	for (int i = 0; i<size; i++)
+	{
+		for (int j = 0; j<size; j++)
+		{
+			gaus[i][j] /= sum;
+		}
+	}
+	return;
+}
+
+void ImageProcessor::gaussianFilter(int ksize, int idx) {
+	double **kernel;
+	kernel = (double **)malloc(ksize * sizeof(double*));
+	for (int i = 0; i < ksize; i++) {
+		kernel[i] = (double *)malloc(ksize * sizeof(double));
+	}
+	getGaussianKernel(kernel, ksize, SIGMA);
+	filter2D(kernel, ksize, idx);
+	for (int i = 0; i < ksize; i++) {
+		delete kernel[i];
+	}
+	delete kernel;
+}
+
+void ImageProcessor::medianFilter(int ksize, int idx) {
+	//commit(idx);
+	//Mat newImg = images[idx].clone();
+	//int iRows = newImg.rows;
+	//int iCols = newImg.cols;
+	//int *orderR = (int *)malloc(sizeof(int)*ksize ^ 2);
+	//int *orderG = (int *)malloc(sizeof(int)*ksize ^ 2);
+	//int *orderB = (int *)malloc(sizeof(int)*ksize ^ 2);
+	//for (int i = ksize / 2; i < iRows - ksize / 2; i++) {
+	//	for (int j = ksize / 2; j < iCols - ksize / 2; j++) {
+	//		Vec3b tmp = images[idx].at<Vec3b>(i, j);
+	//		for (int m = 0; m < ksize; m++) {
+	//			for (int n = 0; n < ksize; n++) {
+	//				int i_t = i - (ksize / 2) + m;
+	//				int j_t = j - (ksize / 2) + n;
+	//				Vec3b tmp1 = images[idx].at<Vec3b>(i_t, j_t);
+	//				orderR[m*ksize + n] = tmp1[2];
+	//				orderG[m*ksize + n] = tmp1[1];
+	//				orderB[m*ksize + n] = tmp1[0];
+	//			}
+	//		}
+	//		// sort
+	//		std::sort(orderR, &orderR[ksize^2]);
+	//		std::sort(orderG, &orderG[ksize ^ 2]);
+	//		std::sort(orderB, &orderB[ksize ^ 2]);
+	//		tmp[0] = orderB[(ksize ^ 2) / 2];
+	//		tmp[1] = orderG[(ksize ^ 2) / 2];
+	//		tmp[2] = orderR[(ksize ^ 2) / 2];
+	//		newImg.at<Vec3b>(i, j) = tmp;
+	//	}
+	//}
+	//images[idx] = newImg;
+}
+
+// Part of Canny filter
+void SobelGradDirction(const Mat imageSource, Mat &imageSobelX, Mat &imageSobelY, double *&pointDrection)
+{
+	pointDrection = new double[(imageSource.rows - 1)*(imageSource.cols - 1)];
+	for (int i = 0; i<(imageSource.rows - 1)*(imageSource.cols - 1); i++)
+	{
+		pointDrection[i] = 0;
+	}
+	imageSobelX = Mat::zeros(imageSource.size(), CV_32SC1);
+	imageSobelY = Mat::zeros(imageSource.size(), CV_32SC1);
+	uchar *P = imageSource.data;
+	uchar *PX = imageSobelX.data;
+	uchar *PY = imageSobelY.data;
+
+	int step = imageSource.step;
+	int stepXY = imageSobelX.step;
+	int k = 0;
+	int m = 0;
+	int n = 0;
+	for (int i = 1; i<(imageSource.rows - 1); i++)
+	{
+		for (int j = 1; j<(imageSource.cols - 1); j++)
+		{
+			//通过指针遍历图像上每一个像素   
+			double gradY = P[(i - 1)*step + j + 1] + P[i*step + j + 1] * 2 + P[(i + 1)*step + j + 1] - P[(i - 1)*step + j - 1] - P[i*step + j - 1] * 2 - P[(i + 1)*step + j - 1];
+			PY[i*stepXY + j*(stepXY / step)] = abs(gradY);
+			double gradX = P[(i + 1)*step + j - 1] + P[(i + 1)*step + j] * 2 + P[(i + 1)*step + j + 1] - P[(i - 1)*step + j - 1] - P[(i - 1)*step + j] * 2 - P[(i - 1)*step + j + 1];
+			PX[i*stepXY + j*(stepXY / step)] = abs(gradX);
+			if (gradX == 0)
+			{
+				gradX = 0.00000000000000001;  //防止除数为0异常  
+			}
+			pointDrection[k] = atan(gradY / gradX)*57.3;//弧度转换为度  
+			pointDrection[k] += 90;
+			k++;
+		}
+	}
+	convertScaleAbs(imageSobelX, imageSobelX);
+	convertScaleAbs(imageSobelY, imageSobelY);
+}
+
+// Part of Canny filter
+void SobelAmplitude(const Mat imageGradX, const Mat imageGradY, Mat &SobelAmpXY)
+{
+	SobelAmpXY = Mat::zeros(imageGradX.size(), CV_32FC1);
+	for (int i = 0; i<SobelAmpXY.rows; i++)
+	{
+		for (int j = 0; j<SobelAmpXY.cols; j++)
+		{
+			float tmp = sqrt(imageGradX.at<uchar>(i, j)*imageGradX.at<uchar>(i, j) + imageGradY.at<uchar>(i, j)*imageGradY.at<uchar>(i, j));
+			if (tmp > 255)
+				tmp = 255;
+			SobelAmpXY.at<float>(i, j) = tmp;
+		}
+	}
+	convertScaleAbs(SobelAmpXY, SobelAmpXY);
+}
+
+// Part of Canny filter
+void LocalMaxValue(const Mat imageInput, Mat &imageOutput, double *pointDrection)
+{
+	//imageInput.copyTo(imageOutput);  
+	imageOutput = imageInput.clone();
+	int k = 0;
+	for (int i = 1; i<imageInput.rows - 1; i++)
+	{
+		for (int j = 1; j<imageInput.cols - 1; j++)
+		{
+			int value00 = imageInput.at<uchar>((i - 1), j - 1);
+			int value01 = imageInput.at<uchar>((i - 1), j);
+			int value02 = imageInput.at<uchar>((i - 1), j + 1);
+			int value10 = imageInput.at<uchar>((i), j - 1);
+			int value11 = imageInput.at<uchar>((i), j);
+			int value12 = imageInput.at<uchar>((i), j + 1);
+			int value20 = imageInput.at<uchar>((i + 1), j - 1);
+			int value21 = imageInput.at<uchar>((i + 1), j);
+			int value22 = imageInput.at<uchar>((i + 1), j + 1);
+
+			if (pointDrection[k]>0 && pointDrection[k] <= 45)
+			{
+				if (value11 <= (value12 + (value02 - value12)*tan(pointDrection[(i-1)*imageOutput.rows + j])) || (value11 <= (value10 + (value20 - value10)*tan(pointDrection[(i-1)*imageOutput.rows + j]))))
+				{
+					imageOutput.at<uchar>(i, j) = 0;
+				}
+			}
+			if (pointDrection[k]>45 && pointDrection[k] <= 90)
+
+			{
+				if (value11 <= (value01 + (value02 - value01) / tan(pointDrection[(i - 1)*imageOutput.cols + j])) || value11 <= (value21 + (value20 - value21) / tan(pointDrection[(i - 1)*imageOutput.cols + j])))
+				{
+					imageOutput.at<uchar>(i, j) = 0;
+
+				}
+			}
+			if (pointDrection[k]>90 && pointDrection[k] <= 135)
+			{
+				if (value11 <= (value01 + (value00 - value01) / tan(180 - pointDrection[(i - 1)*imageOutput.cols + j])) || value11 <= (value21 + (value22 - value21) / tan(180 - pointDrection[(i - 1)*imageOutput.cols + j])))
+				{
+					imageOutput.at<uchar>(i, j) = 0;
+				}
+			}
+			if (pointDrection[k]>135 && pointDrection[k] <= 180)
+			{
+				if (value11 <= (value10 + (value00 - value10)*tan(180 - pointDrection[(i-1)*imageOutput.cols + j])) || value11 <= (value12 + (value22 - value11)*tan(180 - pointDrection[(i-1)*imageOutput.cols + j])))
+				{
+					imageOutput.at<uchar>(i, j) = 0;
+				}
+			}
+			k++;
+		}
+	}
+}
+
+// Part of Canny filter
+void DoubleThreshold(Mat &imageIput, double lowThreshold, double highThreshold)
+{
+	for (int i = 0; i<imageIput.rows; i++)
+	{
+		for (int j = 0; j<imageIput.cols; j++)
+		{
+			if (imageIput.at<uchar>(i, j)>highThreshold)
+			{
+				imageIput.at<uchar>(i, j) = 255;
+			}
+			if (imageIput.at<uchar>(i, j)<lowThreshold)
+			{
+				imageIput.at<uchar>(i, j) = 0;
+			}
+		}
+	}
+}
+
+// Part of Canny filter
+void DoubleThresholdLink(Mat &imageInput, double lowThreshold, double highThreshold)
+{
+	for (int i = 1; i<imageInput.rows - 1; i++)
+	{
+		for (int j = 1; j<imageInput.cols - 1; j++)
+		{
+			if (imageInput.at<uchar>(i, j)>lowThreshold&&imageInput.at<uchar>(i, j)<255)
+			{
+				if (imageInput.at<uchar>(i - 1, j - 1) == 255 || imageInput.at<uchar>(i - 1, j) == 255 || imageInput.at<uchar>(i - 1, j + 1) == 255 ||
+					imageInput.at<uchar>(i, j - 1) == 255 || imageInput.at<uchar>(i, j) == 255 || imageInput.at<uchar>(i, j + 1) == 255 ||
+					imageInput.at<uchar>(i + 1, j - 1) == 255 || imageInput.at<uchar>(i + 1, j) == 255 || imageInput.at<uchar>(i + 1, j + 1) == 255)
+				{
+					imageInput.at<uchar>(i, j) = 255;
+					DoubleThresholdLink(imageInput, lowThreshold, highThreshold); //递归调用  
+				}
+				else
+				{
+					imageInput.at<uchar>(i, j) = 0;
+				}
+			}
+		}
+	}
+}
+
+void ImageProcessor::canny(int idx) {
+	commit(idx);
+	// STEP1: Gaussian filter
+	gaussianFilter(5, idx);
+	Mat copyImg = images[idx].clone();
+	int iRows = copyImg.rows;
+	int iCols = copyImg.cols;
+	if (copyImg.channels() != 1) {
+		// convert the image into grayscale
+		cvtColor(copyImg, copyImg, CV_RGB2GRAY);
+	}
+	// copyImg now is a 1channel grayscale image, do operation to this image.
+	Mat imageSobelY;
+	Mat imageSobelX;
+	double *pointDirection = new double[(imageSobelX.cols - 1)*(imageSobelX.rows - 1)];  //定义梯度方向角数组  
+	SobelGradDirction(copyImg, imageSobelX, imageSobelY, pointDirection);  //计算X、Y方向梯度和方向角  
+	Mat SobelGradAmpl;
+	SobelAmplitude(imageSobelX, imageSobelY, SobelGradAmpl);   //计算X、Y方向梯度融合幅值  
+	Mat imageLocalMax;
+	LocalMaxValue(SobelGradAmpl, imageLocalMax, pointDirection);  //局部非极大值抑制  
+	Mat cannyImage;
+	cannyImage = Mat::zeros(imageLocalMax.size(), CV_8UC1);
+	DoubleThreshold(imageLocalMax, 40, 100);        //双阈值处理  
+	DoubleThresholdLink(imageLocalMax, 40, 100);   //双阈值中间阈值滤除及连接  
+
+	// then recover the 3 channels image
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			unsigned char tmp = imageLocalMax.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
 }

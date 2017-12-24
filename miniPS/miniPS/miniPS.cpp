@@ -20,6 +20,7 @@ miniPS::miniPS(QWidget *parent)
 	ui.rotateWidget->setVisible(false);
 	ui.GSAWidget->setVisible(false);
 	ui.UGSAWidget->setVisible(false);
+	ui.selfFilterWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
@@ -97,7 +98,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionG_hist, SIGNAL(triggered()), this, SLOT(on_slotGHist_trigged()));
 	connect(ui.actionB_hist, SIGNAL(triggered()), this, SLOT(on_slotBHist_trigged()));
 	connect(ui.actionEqualization, SIGNAL(triggered()), this, SLOT(on_slotHistEqualization()));
-	connect(ui.actionfilter, SIGNAL(triggered()), this, SLOT(on_slotFilter_trigged()));
+	connect(ui.actionfilter_2, SIGNAL(triggered()), this, SLOT(on_slotFilter_trigged()));
 	connect(ui.filterOkBtn, SIGNAL(clicked()), this, SLOT(on_filterOk_trigged()));
 	connect(ui.actionrotate, SIGNAL(triggered()), this, SLOT(on_slotRotate_trigged()));
 	connect(ui.rotateOkBtn, SIGNAL(clicked()), this, SLOT(on_rotateOk_trigged()));
@@ -109,6 +110,13 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.GSASliderD, SIGNAL(valueChanged(int)), this, SLOT(on_GSALinearSlid(int)));
 	connect(ui.UGSAOkBtn, SIGNAL(clicked()), this, SLOT(on_UGSAOk_trigged()));
 	connect(ui.actionexp_log, SIGNAL(triggered()), this, SLOT(on_slotGSAExpLog_trigged()));
+	connect(ui.action3_3_self_define, SIGNAL(triggered()), this, SLOT(on_selfFilter_trigged()));
+	connect(ui.selfFilterOkBtn, SIGNAL(clicked()), this, SLOT(on_selfFilterOk_trigged()));
+	connect(ui.actionsobelX, SIGNAL(triggered()), this, SLOT(on_slotSobelX_trigged()));
+	connect(ui.actionsobelY, SIGNAL(triggered()), this, SLOT(on_slotSobelY_trigged()));
+	connect(ui.actionsobelXY, SIGNAL(triggered()), this, SLOT(on_slotSobelXY_trigged()));
+	connect(ui.actionlaplace, SIGNAL(triggered()), this, SLOT(on_slotLaplace_trigged()));
+	connect(ui.actioncanny, SIGNAL(triggered()), this, SLOT(on_slotCanny_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -158,13 +166,50 @@ miniPS::miniPS(QWidget *parent)
 	ui.horizontalSlider_v->setTickInterval(30);
 	ui.horizontalSlider_v->setTickPosition(QSlider::TicksAbove);
 
+	// Initialize edge detection kernel
+	double **kernel;
+	sobelX = (double **)malloc(3 * sizeof(double*));
+	sobelY = (double **)malloc(3 * sizeof(double*));
+	laplace = (double **)malloc(3 * sizeof(double*));
+	for (int i = 0; i < 3; i++) {
+		sobelX[i] = (double *)malloc(3 * sizeof(double));
+		sobelY[i] = (double *)malloc(3 * sizeof(double));
+	    laplace[i] = (double *)malloc(3 * sizeof(double));
+	}
+	sobelX[0][0] = -1;
+	sobelX[0][1] = 0;
+	sobelX[0][2] = 1;
+	sobelX[1][0] = -2;
+	sobelX[1][1] = 0;
+	sobelX[1][2] = 2;
+	sobelX[2][0] = -1;
+	sobelX[2][1] = 0;
+	sobelX[2][2] = 1;
+	sobelY[0][0] = 1;
+	sobelY[0][1] = 2;
+	sobelY[0][2] = 1;
+	sobelY[1][0] = 0;
+	sobelY[1][1] = 0;
+	sobelY[1][2] = 0;
+	sobelY[2][0] = -1;
+	sobelY[2][1] = -2;
+	sobelY[2][2] = -1;
+	laplace[0][0] = 0;
+	laplace[0][1] = 1;
+	laplace[0][2] = 0;
+	laplace[1][0] = 1;
+	laplace[1][1] = -4;
+	laplace[1][2] = 1;
+	laplace[2][0] = 0;
+	laplace[2][1] = 1;
+	laplace[2][2] = 0;
+
 	setMouseTracking(true);
 	ui.centralWidget->setMouseTracking(true);
 }
 
 miniPS::~miniPS() {
 	for (int i = 0; i < NLAYERS; i++) {
-		//delete this->images[i];
 		delete this->myViews[i];
 	}
 }
@@ -774,6 +819,15 @@ void miniPS::on_slotFilter_trigged() {
 	ui.filterWidget->setVisible(true);
 }
 
+// When "self define filter" button is pressed
+void miniPS::on_selfFilter_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.selfFilterWidget->setVisible(true);
+}
+
 // Do filter operation
 void miniPS::on_filterOk_trigged() {
 	if (myViews[focusedLayer]->scene() == NULL) {
@@ -781,9 +835,67 @@ void miniPS::on_filterOk_trigged() {
 		ui.filterWidget->setVisible(false);
 		return;
 	}
-	//
+	int kernelSize = ui.inputKernelSize->value();
+	if (kernelSize % 2 == 0) // Make sure kernelSize is odd
+		kernelSize++;
+	int boxFlag = 0, gaussianFlag = 0, medianFlag = 0;
+	if (ui.inputFilterChoiceBox->checkState() == Qt::Checked) {
+		boxFlag = 1;
+	}
+	if (ui.inputFilterChoiceGaussian->checkState() == Qt::Checked) {
+		gaussianFlag = 1;
+	}
+	if (ui.inputFilterChoiceMedian->checkState() == Qt::Checked) {
+		medianFlag = 1;
+	}
+	if ((boxFlag + gaussianFlag + medianFlag) != 1) {
+		QMessageBox::about(NULL, "Oooops", "You can only check one choice");
+		ui.filterWidget->setVisible(false);
+		return;
+	}
+	if (boxFlag == 1) { // Box filtering
+		myProcessor.boxFilter(kernelSize, focusedLayer);
+	}
+	else if (gaussianFlag == 1) { // Gaussian filtering
+		myProcessor.gaussianFilter(kernelSize, focusedLayer);
+	}
+	else { // Median filtering
+		myProcessor.medianFilter(kernelSize, focusedLayer);
+	}
 	refreshImg();
 	ui.filterWidget->setVisible(false);
+}
+
+// Do self-defined filter operation
+void miniPS::on_selfFilterOk_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.selfFilterWidget->setVisible(false);
+		return;
+	}
+	double **kernel;  // Get user-designed kernel
+	kernel = (double **)malloc(3 * sizeof(double*));
+	for (int i = 0; i < 3; i++) {
+		kernel[i] = (double *)malloc(3 * sizeof(double));
+	}
+	kernel[0][0] = ui.inputSelfFilter1->value();
+	kernel[0][1] = ui.inputSelfFilter2->value();
+	kernel[0][2] = ui.inputSelfFilter3->value();
+	kernel[1][0] = ui.inputSelfFilter4->value();
+	kernel[1][1] = ui.inputSelfFilter5->value();
+	kernel[1][2] = ui.inputSelfFilter6->value();
+	kernel[2][0] = ui.inputSelfFilter7->value();
+	kernel[2][1] = ui.inputSelfFilter8->value();
+	kernel[2][2] = ui.inputSelfFilter9->value();
+
+	// call function
+	myProcessor.filter2D(kernel, 3, focusedLayer);
+	refreshImg();
+	for (int i = 0; i < 3; i++) {
+		delete kernel[i];
+	}
+	delete kernel;
+	ui.selfFilterWidget->setVisible(false);
 }
 
 // When "rotate" button is pressed
@@ -799,17 +911,19 @@ void miniPS::on_slotRotate_trigged() {
 void miniPS::on_rotateOk_trigged() {
 	if (myViews[focusedLayer]->scene() == NULL) {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		ui.rotateWidget->setVisible(false);
 		return;
 	}
 	float theta = ui.inputRotateTheta->value();
 	if (theta == 0) {
+		ui.rotateWidget->setVisible(false);
 		return;
 	}
 	//myProcessor.rotateCW(theta, focusedLayer);
 	if (ui.inputRotateChoiceNN->checkState() == Qt::Checked) {
 		if (ui.inputRotateChoiceLINEAR->checkState() == Qt::Checked) {// Both are checked
 			QMessageBox::about(NULL, "Oooops", "You can only check one choice");
-			ui.resizeWidget->setVisible(false);
+			ui.rotateWidget->setVisible(false);
 			return;
 		}
 		else {// use NN
@@ -821,7 +935,7 @@ void miniPS::on_rotateOk_trigged() {
 	}
 	else {// None are checked
 		QMessageBox::about(NULL, "Oooops", "You must take one choice");
-		ui.resizeWidget->setVisible(false);
+		ui.rotateWidget->setVisible(false);
 		return;
 	}
 	refreshImg();
@@ -918,6 +1032,7 @@ void miniPS::on_slotGSAExpLog_trigged() {
 
 // Do exp/log GSA
 void miniPS::on_UGSAOk_trigged() {
+	myProcessor.commit(focusedLayer);
 	if (myViews[focusedLayer]->scene() == NULL) {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		ui.UGSAWidget->setVisible(false);
@@ -952,4 +1067,53 @@ void miniPS::on_UGSAOk_trigged() {
 	}
 	refreshImg();
 	ui.UGSAWidget->setVisible(false);
+}
+
+// Do sobel edge detection
+void miniPS::on_slotSobelX_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.filter2D(sobelX, 3, focusedLayer);
+	refreshImg();
+}
+
+void miniPS::on_slotSobelY_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.filter2D(sobelY, 3, focusedLayer);
+	refreshImg();
+}
+
+void miniPS::on_slotSobelXY_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.filter2D(sobelX, 3, focusedLayer);
+	myProcessor.filter2D(sobelY, 3, focusedLayer);
+	refreshImg();
+}
+
+// Do laplace edge detection
+void miniPS::on_slotLaplace_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.filter2D(laplace, 3, focusedLayer);
+	refreshImg();
+}
+
+// Do canny edge detection
+void miniPS::on_slotCanny_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.canny(focusedLayer);
+	refreshImg();
 }

@@ -1700,7 +1700,7 @@
        <string>Box</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="inputFilterChoiceMid">
+     <widget class="QCheckBox" name="inputFilterChoiceMedian">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -1710,7 +1710,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>CheckBox</string>
+       <string>Median</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="inputFilterChoiceGaussian">
@@ -1723,7 +1723,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>CheckBox</string>
+       <string>Gaussian</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_35">
@@ -1749,10 +1749,13 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>2</number>
+       <number>3</number>
       </property>
       <property name="maximum">
        <number>25</number>
+      </property>
+      <property name="singleStep">
+       <number>2</number>
       </property>
      </widget>
      <widget class="QPushButton" name="filterOkBtn">
@@ -2145,6 +2148,9 @@
         <height>25</height>
        </rect>
       </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="inputUGSAB">
       <property name="geometry">
@@ -2154,6 +2160,9 @@
         <width>76</width>
         <height>25</height>
        </rect>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="inputUGSAC">
@@ -2166,7 +2175,10 @@
        </rect>
       </property>
       <property name="minimum">
-       <double>1.500000000000000</double>
+       <double>0.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>999.000000000000000</double>
       </property>
      </widget>
      <widget class="QCheckBox" name="inputUGSAexp">
@@ -2200,6 +2212,159 @@
        <rect>
         <x>250</x>
         <y>230</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="selfFilterWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>331</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_49">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>181</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Self-define Filter:</string>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter1">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>100</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter2">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>100</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter3">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>100</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter4">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>130</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter5">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>130</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter6">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>130</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter7">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>160</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter8">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>160</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QDoubleSpinBox" name="inputSelfFilter9">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>160</y>
+        <width>61</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="selfFilterOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>250</y>
         <width>112</width>
         <height>34</height>
        </rect>
@@ -2274,15 +2439,39 @@
      <addaction name="actionlinear"/>
      <addaction name="actionexp_log"/>
     </widget>
+    <widget class="QMenu" name="menufilter">
+     <property name="title">
+      <string>filter</string>
+     </property>
+     <addaction name="actionfilter_2"/>
+     <addaction name="action3_3_self_define"/>
+    </widget>
+    <widget class="QMenu" name="menuedge_detection">
+     <property name="title">
+      <string>edge detection</string>
+     </property>
+     <widget class="QMenu" name="menusobel">
+      <property name="title">
+       <string>sobel</string>
+      </property>
+      <addaction name="actionsobelX"/>
+      <addaction name="actionsobelY"/>
+      <addaction name="actionsobelXY"/>
+     </widget>
+     <addaction name="menusobel"/>
+     <addaction name="actionlaplace"/>
+     <addaction name="actioncanny"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
     <addaction name="menucolor_operation"/>
     <addaction name="menubinary_analysis"/>
     <addaction name="actionresize"/>
     <addaction name="menudraw_histogram"/>
-    <addaction name="actionfilter"/>
+    <addaction name="menufilter"/>
     <addaction name="actionrotate"/>
     <addaction name="menugrayscale_adjustment"/>
+    <addaction name="menuedge_detection"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -2423,11 +2612,6 @@
     <string>Equalization</string>
    </property>
   </action>
-  <action name="actionfilter">
-   <property name="text">
-    <string>filter</string>
-   </property>
-  </action>
   <action name="actionrotate">
    <property name="text">
     <string>rotate</string>
@@ -2446,6 +2630,41 @@
   <action name="actionlogarithm">
    <property name="text">
     <string>logarithm</string>
+   </property>
+  </action>
+  <action name="actionfilter_2">
+   <property name="text">
+    <string>default</string>
+   </property>
+  </action>
+  <action name="action3_3_self_define">
+   <property name="text">
+    <string>3*3 self-define</string>
+   </property>
+  </action>
+  <action name="actionlaplace">
+   <property name="text">
+    <string>laplace</string>
+   </property>
+  </action>
+  <action name="actioncanny">
+   <property name="text">
+    <string>canny</string>
+   </property>
+  </action>
+  <action name="actionsobelX">
+   <property name="text">
+    <string>sobelX</string>
+   </property>
+  </action>
+  <action name="actionsobelY">
+   <property name="text">
+    <string>sobelY</string>
+   </property>
+  </action>
+  <action name="actionsobelXY">
+   <property name="text">
+    <string>sobelXY</string>
    </property>
   </action>
  </widget>

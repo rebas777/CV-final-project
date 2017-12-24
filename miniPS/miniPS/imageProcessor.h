@@ -11,6 +11,7 @@
 #define CHANNEL_R 0
 #define CHANNEL_G 1
 #define CHANNEL_B 2
+#define SIGMA 1.2
 
 using namespace cv;
 
@@ -57,4 +58,10 @@ public:
 	void makeGSABackup(int idx);
 	Mat drawLinearFunction(int a, int b, int c, int d);
 
+	void filter2D(double **kernel, int ksize, int idx);
+	void boxFilter(int ksize, int idx);
+	void gaussianFilter(int ksize, int idx);
+	void medianFilter(int ksize, int idx);
+
+	void canny(int idx);
 };
