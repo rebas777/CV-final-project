@@ -19,10 +19,15 @@ class ImageProcessor {
 
 private:
 	std::vector<bool> undoMarks = { false, false, false, false, false };
+	Mat Theta1;
+	Mat Theta2;
 
 	int otsu(Mat img);
 	void makeHist(int *ihist, int channelNum, Mat img);
 	void bilinearInter(float x0, float y0, Mat img, int &rVal, int &gVal, int &bVal);
+	void initPara();
+	Mat sigmoid(Mat src);
+
 	 
 public:
 
@@ -64,4 +69,6 @@ public:
 	void medianFilter(int ksize, int idx);
 
 	void canny(int idx);
+
+	int helloWorld(int idx);
 };

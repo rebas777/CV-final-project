@@ -121,4 +121,6 @@ void on_slotSobelXY_trigged();
 void on_slotLaplace_trigged();
 void on_slotCanny_trigged();
 void on_slotHelloWorld_trigged();
+void on_slotColorExchange();
+void in_slotColorReset();
 };

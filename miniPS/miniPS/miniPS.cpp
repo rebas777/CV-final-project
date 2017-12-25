@@ -125,7 +125,8 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionlaplace, SIGNAL(triggered()), this, SLOT(on_slotLaplace_trigged()));
 	connect(ui.actioncanny, SIGNAL(triggered()), this, SLOT(on_slotCanny_trigged()));
 	connect(ui.helloWorldBtn, SIGNAL(clicked()), this, SLOT(on_slotHelloWorld_trigged()));
-	
+	connect(ui.colorSwitchBtn, SIGNAL(clicked()), this, SLOT(on_slotColorExchange()));
+	connect(ui.colorResetBtn, SIGNAL(clicked()), this, SLOT(in_slotColorReset()));
 	
 	// Set shortcut for menu
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
@@ -551,9 +552,9 @@ void miniPS::on_viewPenMove_trigged(int x, int y) {
 	if (y >= myProcessor.images[focusedLayer].rows)
 		y = myProcessor.images[focusedLayer].rows - 1;
 	//qDebug("paint paint paint \n");
-	CvScalar color = CV_RGB(color1[2], color1[1], color1[0]);
+	CvScalar color = CV_RGB(color1[0], color1[1], color1[2]);
 	Point p(x, y);
-	circle(myProcessor.images[focusedLayer], p, 1, color);
+	circle(myProcessor.images[focusedLayer], p, 5, color, -1);
 	refreshImg();
 }
 
@@ -568,10 +569,11 @@ void miniPS::on_viewEraserMove_trigged(int x, int y) {
 	//qDebug("erase erase erase \n");
 	CvScalar color = CV_RGB(255,255,255);
 	Point p(x, y);
-	circle(myProcessor.images[focusedLayer], p, 3, color);
+	circle(myProcessor.images[focusedLayer], p, 10, color, -1);
 	refreshImg();
 }
 
+// Self-defined SLOT triggered by a SIGNAL from MyScene
 void miniPS::on_viewColorClick_trigged(int x, int y) {
 	if (x < 0)  x = 0;
 	if (y < 0)  y = 0;
@@ -585,7 +587,29 @@ void miniPS::on_viewColorClick_trigged(int x, int y) {
 	color1[1] = ans[1];
 	color1[2] = ans[2];
 	// Change displayed color
+	QString css;
+	css.sprintf("QLabel { background-color : rgb(%d,%d,%d); color : blue; }", color1[0], color1[1], color1[2]);
+	ui.picked_color1->setStyleSheet(css);
+}
 
+// When "color ex" button is pressed
+void miniPS::on_slotColorExchange() {
+	std::vector<int> tmp = { color1[0], color1[1], color1[2] };
+	color1 = {color2[0], color2[1], color2[2]};
+	color2 = { tmp[0], tmp[1], tmp[2] };
+	QString css;
+	css.sprintf("QLabel { background-color : rgb(%d,%d,%d); color : blue; }", color1[0], color1[1], color1[2]);
+	ui.picked_color1->setStyleSheet(css);
+	css.sprintf("QLabel { background-color : rgb(%d,%d,%d); color : blue; }", color2[0], color2[1], color2[2]);
+	ui.picked_color2->setStyleSheet(css);
+}
+
+// When "color reset" button is pressed
+void miniPS::in_slotColorReset() {
+	color1 = { 255,255,255 };
+	color2 = { 0,0,0 };
+	ui.picked_color1->setStyleSheet("QLabel { background-color : white; color : blue; }");
+	ui.picked_color2->setStyleSheet("QLabel { background-color : black; color : blue; }");
 }
 
 // Do channel split(R)
@@ -1217,4 +1241,9 @@ void miniPS::on_slotHelloWorld_trigged() {
 		return;
 	}
 	myProcessor.resize(20, 20, NN, focusedLayer);
+	/*int res = myProcessor.helloWorld(focusedLayer);
+	refreshImg();
+	QString report;
+	report.sprintf("Handwriting recognized : %d", res);
+	QMessageBox::about(NULL, "HelloWorld", report);*/
 }

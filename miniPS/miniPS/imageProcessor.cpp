@@ -965,3 +965,119 @@ void ImageProcessor::canny(int idx) {
 		}
 	}
 }
+
+void ImageProcessor::initPara() {
+	Theta1 = Mat(25, 401, CV_64FC1);
+	Theta2 = Mat(10, 26, CV_64FC1);
+	FILE *fp1, *fp2;
+	double tmp;
+
+	// Load Theta1
+	fp1 = fopen("theta1.txt", "r");
+	if (!fp1)
+	{
+		qDebug("Can not open the file.\n");
+		return;
+	}
+	for (int i = 0; i < 25; i++) {
+		for (int j = 0; j < 401; j++) {
+			fscanf(fp1, "%lf", &tmp);
+			Theta1.at<double>(i, j) = tmp;
+		}
+	}
+	fclose(fp1);
+
+	// Load Theta2
+	fp2 = fopen("theta2.txt", "r");
+	if (!fp2) {
+		qDebug("Can not open the file.\n");
+		return;
+	}
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 26; j++) {
+			fscanf(fp2, "%lf", &tmp);
+			Theta2.at<double>(i, j) = tmp;
+		}
+	}
+	fclose(fp2);
+
+	/*double s1 = Theta1.at<double>(0, 0);
+	double s2 = Theta2.at<double>(0, 0);
+	double d1 = Theta1.at<double>(24, 400);
+	double d2 = Theta2.at<double>(9, 25);*/
+}
+
+// Part of handwriting recognizing procedure
+Mat ImageProcessor::sigmoid(Mat src) {
+	Mat dst = Mat(src.size(), src.type());
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			double tmp = src.at<double>(i, j);
+			tmp = 1.0 / (1.0 + exp(-tmp));
+			dst.at<double>(i, j) = tmp;
+		}
+	}
+	return dst;
+}
+
+// Recognize handwriting with trained NN
+int ImageProcessor::helloWorld(int idx) {
+	Mat imgVec = Mat(400, 1, CV_64FC1);
+	int iRows = images[idx].rows;
+	int iCols = images[idx].cols;
+	if (iRows != 20 || iCols != 20) {
+		qDebug("Bad image size !\n");
+		return -1;
+	}
+	initPara();
+	
+	// Vectorization of image[idx]
+	int cur = 0;
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			imgVec.at<double>(cur, 0) = (double)images[idx].at<Vec3b>(i, j)[0];
+			cur++;
+		}
+	}
+
+	// Map grayscale 0~255 to 0.0~1.0
+	for (int i = 0; i < 400; i++) {
+		double tmp = imgVec.at<double>(i, 0);
+		tmp = tmp / 255.0;
+		imgVec.at<double>(i, 0) = tmp;
+	}
+
+	Mat a1 = Mat(401, 1, CV_64FC1);
+	a1.at<double>(0, 0) = 1;
+	for (int k = 0; k < 400; k++) {
+		a1.at<double>(k + 1, 0) = imgVec.at<double>(k, 0);
+	}
+
+	Mat z2 = Theta1 * a1;
+	Mat z2_sig = sigmoid(z2);
+	Mat a2 = Mat(z2_sig.rows + 1, z2_sig.cols, CV_64FC1);
+	a2.at<double>(0, 0) = 1;
+	for (int k = 0; k < z2_sig.rows; k++) {
+		a2.at<double>(k + 1, 0) = z2_sig.at<double>(k, 0);
+	}
+	Mat z3 = Theta2 * a2;
+	Mat h0x = sigmoid(z3);
+	double h0, h1, h2, h3, h4, h5, h6, h7, h8, h9;
+	h0 = h0x.at<double>(0, 0);
+	h1 = h0x.at<double>(1, 0);
+	h2 = h0x.at<double>(2, 0);
+	h3 = h0x.at<double>(3, 0);
+	h4 = h0x.at<double>(4, 0);
+	h5 = h0x.at<double>(5, 0);
+	h6 = h0x.at<double>(6, 0);
+	int maxPos = 0;
+	double maxVal = h0x.at<double>(0, 0);
+	for (int k = 0; k < h0x.rows; k++) {
+		double tmp = h0x.at<double>(k, 0);
+		if (tmp > maxVal) {
+			maxVal = tmp;
+			maxPos = k;
+		}
+	}
+	return maxPos;
+}
