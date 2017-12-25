@@ -47,6 +47,8 @@ private:
 	int imagesDirtyFlag[NLAYERS];
 	// Image processor to process all image operations
 	ImageProcessor myProcessor;
+	// Picked colors
+	std::vector<int> color1, color2;
 
 	void refreshImg();
 
@@ -65,10 +67,16 @@ void on_slotSave_trigged();
 void on_slotZoomSlid(int cur);
 void on_slotFreshScalVal();
 void on_slotSlctMode_trigged();
+void on_slotPenMode_trigged();
+void on_slotEraserMode_trigged();
+void on_slotPickMode_trigged();
 void on_slotNormMode_trigged();
 void on_slotCutBtn_trigged();
 void on_slotClean_trigged();
 void on_viewMouseMove_trigged(int x, int y);  // Self-defined slot
+void on_viewPenMove_trigged(int x, int y); // Self-defined slot
+void on_viewEraserMove_trigged(int x, int y); // Self-defined slot
+void on_viewColorClick_trigged(int x, int y); // Self-defined slot
 void on_channelSplitR_trigged();
 void on_channelSplitG_trigged();
 void on_channelSplitB_trigged();
@@ -112,4 +120,5 @@ void on_slotSobelY_trigged();
 void on_slotSobelXY_trigged();
 void on_slotLaplace_trigged();
 void on_slotCanny_trigged();
+void on_slotHelloWorld_trigged();
 };

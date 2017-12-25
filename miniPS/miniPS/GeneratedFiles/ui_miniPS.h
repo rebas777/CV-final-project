@@ -67,6 +67,8 @@ public:
     QAction *actionsobelX;
     QAction *actionsobelY;
     QAction *actionsobelXY;
+    QAction *actionbinary_mopholo;
+    QAction *actiongrayscale_mophology;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -123,6 +125,7 @@ public:
     QPushButton *subtractionBtn;
     QPushButton *multiplicationBtn;
     QPushButton *spinBtn;
+    QPushButton *helloWorldBtn;
     QFrame *line_4;
     QFrame *line_6;
     QFrame *line_7;
@@ -330,6 +333,10 @@ public:
         actionsobelY->setObjectName(QStringLiteral("actionsobelY"));
         actionsobelXY = new QAction(miniPSClass);
         actionsobelXY->setObjectName(QStringLiteral("actionsobelXY"));
+        actionbinary_mopholo = new QAction(miniPSClass);
+        actionbinary_mopholo->setObjectName(QStringLiteral("actionbinary_mopholo"));
+        actiongrayscale_mophology = new QAction(miniPSClass);
+        actiongrayscale_mophology->setObjectName(QStringLiteral("actiongrayscale_mophology"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -525,7 +532,7 @@ public:
         colorResetBtn->setGeometry(QRect(10, 630, 31, 34));
         getColorBtn = new QPushButton(leftToolBar);
         getColorBtn->setObjectName(QStringLiteral("getColorBtn"));
-        getColorBtn->setGeometry(QRect(10, 510, 112, 34));
+        getColorBtn->setGeometry(QRect(70, 210, 51, 34));
         cutBtn = new QPushButton(leftToolBar);
         cutBtn->setObjectName(QStringLiteral("cutBtn"));
         cutBtn->setGeometry(QRect(10, 110, 51, 34));
@@ -541,6 +548,9 @@ public:
         spinBtn = new QPushButton(leftToolBar);
         spinBtn->setObjectName(QStringLiteral("spinBtn"));
         spinBtn->setGeometry(QRect(70, 110, 51, 34));
+        helloWorldBtn = new QPushButton(leftToolBar);
+        helloWorldBtn->setObjectName(QStringLiteral("helloWorldBtn"));
+        helloWorldBtn->setGeometry(QRect(10, 250, 112, 301));
         line_4 = new QFrame(centralWidget);
         line_4->setObjectName(QStringLiteral("line_4"));
         line_4->setGeometry(QRect(30, 60, 131, 20));
@@ -1028,6 +1038,8 @@ public:
         menuEdit->addAction(actionrotate);
         menuEdit->addAction(menugrayscale_adjustment->menuAction());
         menuEdit->addAction(menuedge_detection->menuAction());
+        menuEdit->addAction(actionbinary_mopholo);
+        menuEdit->addAction(actiongrayscale_mophology);
         menucolor_operation->addAction(menuchannel_split->menuAction());
         menucolor_operation->addAction(actionRGB2GrayScale);
         menucolor_operation->addAction(actionHSB);
@@ -1106,6 +1118,8 @@ public:
         actionsobelX->setText(QApplication::translate("miniPSClass", "sobelX", Q_NULLPTR));
         actionsobelY->setText(QApplication::translate("miniPSClass", "sobelY", Q_NULLPTR));
         actionsobelXY->setText(QApplication::translate("miniPSClass", "sobelXY", Q_NULLPTR));
+        actionbinary_mopholo->setText(QApplication::translate("miniPSClass", "binary mophology", Q_NULLPTR));
+        actiongrayscale_mophology->setText(QApplication::translate("miniPSClass", "grayscale mophology", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -1145,12 +1159,13 @@ public:
         colorResetBtn->setWhatsThis(QApplication::translate("miniPSClass", "Reset the gethered color to black and white", Q_NULLPTR));
 #endif // QT_NO_WHATSTHIS
         colorResetBtn->setText(QApplication::translate("miniPSClass", "re", Q_NULLPTR));
-        getColorBtn->setText(QApplication::translate("miniPSClass", "get color", Q_NULLPTR));
+        getColorBtn->setText(QApplication::translate("miniPSClass", "pick", Q_NULLPTR));
         cutBtn->setText(QApplication::translate("miniPSClass", "cut", Q_NULLPTR));
         addBtn->setText(QApplication::translate("miniPSClass", "add", Q_NULLPTR));
         subtractionBtn->setText(QApplication::translate("miniPSClass", "sub", Q_NULLPTR));
         multiplicationBtn->setText(QApplication::translate("miniPSClass", "multi", Q_NULLPTR));
         spinBtn->setText(QApplication::translate("miniPSClass", "spin", Q_NULLPTR));
+        helloWorldBtn->setText(QApplication::translate("miniPSClass", "HelloWorld", Q_NULLPTR));
         label_9->setText(QApplication::translate("miniPSClass", "H\357\274\232", Q_NULLPTR));
         label_10->setText(QApplication::translate("miniPSClass", "S\357\274\232", Q_NULLPTR));
         label_11->setText(QApplication::translate("miniPSClass", "V:", Q_NULLPTR));

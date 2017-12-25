@@ -12,18 +12,27 @@ void MyScene::setParentView(MyView &parent) {
 
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+	m_isMousePress = true;
+	posX = event->scenePos().x();
+	posY = event->scenePos().y();
 	if (parentView->mode == 1) {
 		if (event->button() == Qt::LeftButton)
 		{
-			m_isMousePress = true;
 			m_beginPoint = event->scenePos();
+		}
+	}
+	if (parentView->mode == 4) {
+		if (event->button() == Qt::LeftButton) {
+			emit colorClick(posX, posY);
 		}
 	}
 	QGraphicsScene::mousePressEvent(event);
 }
 
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-	if (parentView->mode == 1) {
+	posX = event->scenePos().x();
+	posY = event->scenePos().y();
+	if (parentView->mode == 1) { // selection mode
 		if (m_isMousePress)
 		{
 			m_endPoint = event->scenePos();
@@ -37,8 +46,16 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
 		}
 	}
-	posX = event->scenePos().x();
-	posY = event->scenePos().y();
+	if (parentView->mode == 2) { // pen mode
+		if (m_isMousePress) {
+			emit penMove(posX, posY);
+		}
+	}
+	if (parentView->mode == 3) { // eraser mode
+		if (m_isMousePress) {
+			emit eraserMove(posX, posY);
+		}
+	}
 	emit mouseMove(posX, posY);
 	QString xStr, yStr;
 	xStr.sprintf("%d", posX);
@@ -50,10 +67,10 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-	if (parentView->mode == 1) {
+	//if (parentView->mode == 1) {
 		m_endPoint = event->scenePos();
 		m_isMousePress = false;
-	}
+	//}
 	QGraphicsScene::mouseReleaseEvent(event);
 }
 

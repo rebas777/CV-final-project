@@ -700,14 +700,14 @@
     <widget class="QPushButton" name="getColorBtn">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>510</y>
-       <width>112</width>
+       <x>70</x>
+       <y>210</y>
+       <width>51</width>
        <height>34</height>
       </rect>
      </property>
      <property name="text">
-      <string>get color</string>
+      <string>pick</string>
      </property>
     </widget>
     <widget class="QPushButton" name="cutBtn">
@@ -773,6 +773,19 @@
      </property>
      <property name="text">
       <string>spin</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="helloWorldBtn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>250</y>
+       <width>112</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>HelloWorld</string>
      </property>
     </widget>
    </widget>
@@ -2472,6 +2485,8 @@
     <addaction name="actionrotate"/>
     <addaction name="menugrayscale_adjustment"/>
     <addaction name="menuedge_detection"/>
+    <addaction name="actionbinary_mopholo"/>
+    <addaction name="actiongrayscale_mophology"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -2665,6 +2680,16 @@
   <action name="actionsobelXY">
    <property name="text">
     <string>sobelXY</string>
+   </property>
+  </action>
+  <action name="actionbinary_mopholo">
+   <property name="text">
+    <string>binary mophology</string>
+   </property>
+  </action>
+  <action name="actiongrayscale_mophology">
+   <property name="text">
+    <string>grayscale mophology</string>
    </property>
   </action>
  </widget>

@@ -7,7 +7,7 @@ class MyView : public QGraphicsView
 {
 	Q_OBJECT
 public:
-	// mode: normal = 0, selection = 1, 
+	// mode: normal = 0, selection = 1, pen = 2, eraser = 3, color pick = 4
 	int mode;
 	int posX;
 	int posY;

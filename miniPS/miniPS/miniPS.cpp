@@ -25,6 +25,10 @@ miniPS::miniPS(QWidget *parent)
 	//init focused layer
 	focusedLayer = 0;
 
+	// Initialize picked color
+	color1 = { 0,0,0 };
+	color2 = { 255,255,255 };
+
 	//init 5 views
 	myViews[0] = new MyView();
 	myViews[0]->setParentUI(ui);
@@ -68,6 +72,9 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.zoomInBtn, SIGNAL(clicked()), this, SLOT(on_slotFreshScalVal()));
 	connect(ui.normalModeBtn, SIGNAL(clicked()), this, SLOT(on_slotNormMode_trigged()));
 	connect(ui.slctModeBtn, SIGNAL(clicked()), this, SLOT(on_slotSlctMode_trigged()));
+	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(on_slotPenMode_trigged()));
+	connect(ui.pushButton_2, SIGNAL(clicked()), this, SLOT(on_slotEraserMode_trigged()));
+	connect(ui.getColorBtn, SIGNAL(clicked()), this, SLOT(on_slotPickMode_trigged()));
 	connect(ui.cutBtn, SIGNAL(clicked()), this, SLOT(on_slotCutBtn_trigged()));
 	connect(ui.actionclean_all_layers, SIGNAL(triggered()), this, SLOT(on_slotClean_trigged()));
 	connect(ui.actionRed, SIGNAL(triggered()), this, SLOT(on_channelSplitR_trigged()));
@@ -117,6 +124,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.actionsobelXY, SIGNAL(triggered()), this, SLOT(on_slotSobelXY_trigged()));
 	connect(ui.actionlaplace, SIGNAL(triggered()), this, SLOT(on_slotLaplace_trigged()));
 	connect(ui.actioncanny, SIGNAL(triggered()), this, SLOT(on_slotCanny_trigged()));
+	connect(ui.helloWorldBtn, SIGNAL(clicked()), this, SLOT(on_slotHelloWorld_trigged()));
 	
 	
 	// Set shortcut for menu
@@ -313,6 +321,12 @@ void miniPS::refreshImg() {
 	MyScene *scene = new MyScene();
 	connect(scene, SIGNAL(mouseMove(int, int)),
 		this, SLOT(on_viewMouseMove_trigged(int, int)));
+	connect(scene, SIGNAL(penMove(int, int)),
+		this, SLOT(on_viewPenMove_trigged(int, int)));
+	connect(scene, SIGNAL(eraserMove(int, int)),
+		this, SLOT(on_viewEraserMove_trigged(int, int)));
+	connect(scene, SIGNAL(colorClick(int, int)),
+		this, SLOT(on_viewColorClick_trigged(int, int)));
 	scene->setParentView(*myViews[focusedLayer]);
 	scene->addPixmap(QPixmap::fromImage(tmp));
 	myViews[focusedLayer]->setScene(scene);
@@ -413,6 +427,7 @@ void miniPS::on_slotNormMode_trigged() {
 	ui.label_height->setText("0");
 	ui.label_width->setText("0");
 	myViews[focusedLayer]->freshView();
+	qDebug("Now in the normal mode \n");
 }
 
 // When the "slct" button is pressed(change to the selection mode)
@@ -422,7 +437,38 @@ void miniPS::on_slotSlctMode_trigged() {
 		return;
 	}
 	myViews[focusedLayer]->mode = 1;
+	qDebug("Now in the selection mode \n");
 	//TODO:change cursor
+}
+
+// When the "pen" button is pressed(change to the pen mode)
+void miniPS::on_slotPenMode_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "Load Image First", "Please load an image before selection");
+		return;
+	}
+	myViews[focusedLayer]->mode = 2;
+	qDebug("Now in the pen mode \n");
+}
+
+// When the "eraser" button is pressed(change to the eraser mode)
+void miniPS::on_slotEraserMode_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "Load Image First", "Please load an image before selection");
+		return;
+	}
+	myViews[focusedLayer]->mode = 3;
+	qDebug("Now in the eraser mode \n");
+}
+
+// When the "color" label is pressed(change to the color pick mode)
+void miniPS::on_slotPickMode_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "Load Image First", "Please load an image before selection");
+		return;
+	}
+	myViews[focusedLayer]->mode = 4;
+	qDebug("Now in the color pick mode \n");
 }
 
 // When the "cut" button is pressed
@@ -494,6 +540,52 @@ void miniPS::on_viewMouseMove_trigged(int x, int y) {
 		ui.label_bVal->setText(tmp);
 		//ui.label_gsVal->setText("-");
 	}	
+}
+
+// Self-defined SLOT triggered by a SIGNAL from MyScene
+void miniPS::on_viewPenMove_trigged(int x, int y) {
+	if (x < 0)  x = 0;
+	if (y < 0)  y = 0;
+	if (x >= myProcessor.images[focusedLayer].cols)
+		x = myProcessor.images[focusedLayer].cols - 1;
+	if (y >= myProcessor.images[focusedLayer].rows)
+		y = myProcessor.images[focusedLayer].rows - 1;
+	//qDebug("paint paint paint \n");
+	CvScalar color = CV_RGB(color1[2], color1[1], color1[0]);
+	Point p(x, y);
+	circle(myProcessor.images[focusedLayer], p, 1, color);
+	refreshImg();
+}
+
+// Self-defined SLOT triggered by a SIGNAL from MyScene
+void miniPS::on_viewEraserMove_trigged(int x, int y) {
+	if (x < 0)  x = 0;
+	if (y < 0)  y = 0;
+	if (x >= myProcessor.images[focusedLayer].cols)
+		x = myProcessor.images[focusedLayer].cols - 1;
+	if (y >= myProcessor.images[focusedLayer].rows)
+		y = myProcessor.images[focusedLayer].rows - 1;
+	//qDebug("erase erase erase \n");
+	CvScalar color = CV_RGB(255,255,255);
+	Point p(x, y);
+	circle(myProcessor.images[focusedLayer], p, 3, color);
+	refreshImg();
+}
+
+void miniPS::on_viewColorClick_trigged(int x, int y) {
+	if (x < 0)  x = 0;
+	if (y < 0)  y = 0;
+	if (x >= myProcessor.images[focusedLayer].cols)
+		x = myProcessor.images[focusedLayer].cols - 1;
+	if (y >= myProcessor.images[focusedLayer].rows)
+		y = myProcessor.images[focusedLayer].rows - 1;
+	//qDebug("pick pick pick \n");
+	std::vector<int> ans = myProcessor.getPixelVal(x, y, focusedLayer);
+	color1[0] = ans[0];
+	color1[1] = ans[1];
+	color1[2] = ans[2];
+	// Change displayed color
+
 }
 
 // Do channel split(R)
@@ -1116,4 +1208,13 @@ void miniPS::on_slotCanny_trigged() {
 	}
 	myProcessor.canny(focusedLayer);
 	refreshImg();
+}
+
+// Do handwriting recognizing 
+void miniPS::on_slotHelloWorld_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.resize(20, 20, NN, focusedLayer);
 }
