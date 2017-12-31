@@ -741,37 +741,37 @@ void ImageProcessor::gaussianFilter(int ksize, int idx) {
 }
 
 void ImageProcessor::medianFilter(int ksize, int idx) {
-	//commit(idx);
-	//Mat newImg = images[idx].clone();
-	//int iRows = newImg.rows;
-	//int iCols = newImg.cols;
-	//int *orderR = (int *)malloc(sizeof(int)*ksize ^ 2);
-	//int *orderG = (int *)malloc(sizeof(int)*ksize ^ 2);
-	//int *orderB = (int *)malloc(sizeof(int)*ksize ^ 2);
-	//for (int i = ksize / 2; i < iRows - ksize / 2; i++) {
-	//	for (int j = ksize / 2; j < iCols - ksize / 2; j++) {
-	//		Vec3b tmp = images[idx].at<Vec3b>(i, j);
-	//		for (int m = 0; m < ksize; m++) {
-	//			for (int n = 0; n < ksize; n++) {
-	//				int i_t = i - (ksize / 2) + m;
-	//				int j_t = j - (ksize / 2) + n;
-	//				Vec3b tmp1 = images[idx].at<Vec3b>(i_t, j_t);
-	//				orderR[m*ksize + n] = tmp1[2];
-	//				orderG[m*ksize + n] = tmp1[1];
-	//				orderB[m*ksize + n] = tmp1[0];
-	//			}
-	//		}
-	//		// sort
-	//		std::sort(orderR, &orderR[ksize^2]);
-	//		std::sort(orderG, &orderG[ksize ^ 2]);
-	//		std::sort(orderB, &orderB[ksize ^ 2]);
-	//		tmp[0] = orderB[(ksize ^ 2) / 2];
-	//		tmp[1] = orderG[(ksize ^ 2) / 2];
-	//		tmp[2] = orderR[(ksize ^ 2) / 2];
-	//		newImg.at<Vec3b>(i, j) = tmp;
-	//	}
-	//}
-	//images[idx] = newImg;
+	commit(idx);
+	Mat newImg = images[idx].clone();
+	int iRows = newImg.rows;
+	int iCols = newImg.cols;
+	int *orderR = (int *)malloc(sizeof(int)*ksize ^ 2);
+	int *orderG = (int *)malloc(sizeof(int)*ksize ^ 2);
+	int *orderB = (int *)malloc(sizeof(int)*ksize ^ 2);
+	for (int i = ksize / 2; i < iRows - ksize / 2; i++) {
+		for (int j = ksize / 2; j < iCols - ksize / 2; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			for (int m = 0; m < ksize; m++) {
+				for (int n = 0; n < ksize; n++) {
+					int i_t = i - (ksize / 2) + m;
+					int j_t = j - (ksize / 2) + n;
+					Vec3b tmp1 = images[idx].at<Vec3b>(i_t, j_t);
+					orderR[m*ksize + n] = tmp1[2];
+					orderG[m*ksize + n] = tmp1[1];
+					orderB[m*ksize + n] = tmp1[0];
+				}
+			}
+			// sort
+			std::sort(orderR, &orderR[ksize^2]);
+			std::sort(orderG, &orderG[ksize ^ 2]);
+			std::sort(orderB, &orderB[ksize ^ 2]);
+			tmp[0] = orderB[(ksize ^ 2) / 2];
+			tmp[1] = orderG[(ksize ^ 2) / 2];
+			tmp[2] = orderR[(ksize ^ 2) / 2];
+			newImg.at<Vec3b>(i, j) = tmp;
+		}
+	}
+	images[idx] = newImg;
 }
 
 // Part of Canny filter
@@ -967,8 +967,8 @@ void ImageProcessor::canny(int idx) {
 }
 
 void ImageProcessor::initPara() {
-	Theta1 = Mat(25, 401, CV_64FC1);
-	Theta2 = Mat(10, 26, CV_64FC1);
+	Theta1 = Mat(25, 401, CV_32FC1);
+	Theta2 = Mat(10, 26, CV_32FC1);
 	FILE *fp1, *fp2;
 	double tmp;
 
@@ -982,7 +982,7 @@ void ImageProcessor::initPara() {
 	for (int i = 0; i < 25; i++) {
 		for (int j = 0; j < 401; j++) {
 			fscanf(fp1, "%lf", &tmp);
-			Theta1.at<double>(i, j) = tmp;
+			Theta1.at<float>(i, j) = tmp;
 		}
 	}
 	fclose(fp1);
@@ -996,7 +996,7 @@ void ImageProcessor::initPara() {
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 26; j++) {
 			fscanf(fp2, "%lf", &tmp);
-			Theta2.at<double>(i, j) = tmp;
+			Theta2.at<float>(i, j) = tmp;
 		}
 	}
 	fclose(fp2);
@@ -1012,9 +1012,9 @@ Mat ImageProcessor::sigmoid(Mat src) {
 	Mat dst = Mat(src.size(), src.type());
 	for (int i = 0; i < src.rows; i++) {
 		for (int j = 0; j < src.cols; j++) {
-			double tmp = src.at<double>(i, j);
+			float tmp = src.at<float>(i, j);
 			tmp = 1.0 / (1.0 + exp(-tmp));
-			dst.at<double>(i, j) = tmp;
+			dst.at<float>(i, j) = tmp;
 		}
 	}
 	return dst;
@@ -1022,7 +1022,7 @@ Mat ImageProcessor::sigmoid(Mat src) {
 
 // Recognize handwriting with trained NN
 int ImageProcessor::helloWorld(int idx) {
-	Mat imgVec = Mat(400, 1, CV_64FC1);
+	Mat imgVec = Mat(400, 1, CV_32FC1);
 	int iRows = images[idx].rows;
 	int iCols = images[idx].cols;
 	if (iRows != 20 || iCols != 20) {
@@ -1035,45 +1035,45 @@ int ImageProcessor::helloWorld(int idx) {
 	int cur = 0;
 	for (int i = 0; i < iRows; i++) {
 		for (int j = 0; j < iCols; j++) {
-			imgVec.at<double>(cur, 0) = (double)images[idx].at<Vec3b>(i, j)[0];
+			imgVec.at<float>(cur, 0) = (float)images[idx].at<Vec3b>(i, j)[0];
 			cur++;
 		}
 	}
 
 	// Map grayscale 0~255 to 0.0~1.0
 	for (int i = 0; i < 400; i++) {
-		double tmp = imgVec.at<double>(i, 0);
+		float tmp = imgVec.at<float>(i, 0);
 		tmp = tmp / 255.0;
-		imgVec.at<double>(i, 0) = tmp;
+		imgVec.at<float>(i, 0) = tmp;
 	}
 
-	Mat a1 = Mat(401, 1, CV_64FC1);
-	a1.at<double>(0, 0) = 1;
+	Mat a1 = Mat(401, 1, CV_32FC1);
+	a1.at<float>(0, 0) = 1;
 	for (int k = 0; k < 400; k++) {
-		a1.at<double>(k + 1, 0) = imgVec.at<double>(k, 0);
+		a1.at<float>(k + 1, 0) = imgVec.at<float>(k, 0);
 	}
 
 	Mat z2 = Theta1 * a1;
 	Mat z2_sig = sigmoid(z2);
-	Mat a2 = Mat(z2_sig.rows + 1, z2_sig.cols, CV_64FC1);
-	a2.at<double>(0, 0) = 1;
+	Mat a2 = Mat(z2_sig.rows + 1, z2_sig.cols, CV_32FC1);
+	a2.at<float>(0, 0) = 1;
 	for (int k = 0; k < z2_sig.rows; k++) {
-		a2.at<double>(k + 1, 0) = z2_sig.at<double>(k, 0);
+		a2.at<float>(k + 1, 0) = z2_sig.at<float>(k, 0);
 	}
 	Mat z3 = Theta2 * a2;
 	Mat h0x = sigmoid(z3);
-	double h0, h1, h2, h3, h4, h5, h6, h7, h8, h9;
-	h0 = h0x.at<double>(0, 0);
-	h1 = h0x.at<double>(1, 0);
-	h2 = h0x.at<double>(2, 0);
-	h3 = h0x.at<double>(3, 0);
-	h4 = h0x.at<double>(4, 0);
-	h5 = h0x.at<double>(5, 0);
-	h6 = h0x.at<double>(6, 0);
+	float h0, h1, h2, h3, h4, h5, h6, h7, h8, h9;
+	h0 = h0x.at<float>(0, 0);
+	h1 = h0x.at<float>(1, 0);
+	h2 = h0x.at<float>(2, 0);
+	h3 = h0x.at<float>(3, 0);
+	h4 = h0x.at<float>(4, 0);
+	h5 = h0x.at<float>(5, 0);
+	h6 = h0x.at<float>(6, 0);
 	int maxPos = 0;
-	double maxVal = h0x.at<double>(0, 0);
+	float maxVal = h0x.at<float>(0, 0);
 	for (int k = 0; k < h0x.rows; k++) {
-		double tmp = h0x.at<double>(k, 0);
+		float tmp = h0x.at<float>(k, 0);
 		if (tmp > maxVal) {
 			maxVal = tmp;
 			maxPos = k;
@@ -1131,4 +1131,54 @@ void ImageProcessor::houghCircle(int idx) {
 	}
 
 	images[idx] = srcImage;
+}
+
+
+
+void ImageProcessor::test(int idx) {
+	Mat tmpImg1 = images[idx].clone();
+	cvtColor(tmpImg1, tmpImg1, CV_RGB2GRAY);
+}
+
+
+void ImageProcessor::dilation(Mat B, int anchorRow, int anchorCol, int idx) {
+	if (anchorRow >= B.rows || anchorRow < 0 || anchorCol >= B.cols || anchorCol < 0) {
+		qDebug("Bad anchor !");
+		return;
+	}
+	commit(idx);
+	Mat grayImg = images[idx].clone();
+	cvtColor(grayImg, grayImg, CV_RGB2GRAY);
+	// 先转化成灰度图
+	Mat tmpImg = grayImg.clone();
+	for (int i = 0; i < grayImg.rows; i++) {
+		for (int j = 0; j < grayImg.cols; j++) {
+			int max = 0;
+			for (int m = 0; m < B.rows; m++) {
+				int B_row = i - anchorRow + m;
+				if (B_row < 0 || B_row >= grayImg.rows) {
+					continue; // 越界检测
+				}
+				for (int n = 0; n < B.cols; n++) {
+					int B_col = j - anchorCol + n;
+					if (B_col < 0 || B_col >= grayImg.cols) {
+						continue;
+					}
+					int tmp = grayImg.at<uchar>(B_row, B_col);
+					if (tmp > max && B.at<int>(m, n) == 1) {
+						max = tmp;
+					}
+				}
+			}
+			tmpImg.at<uchar>(i, j) = max;
+		}
+	}
+	// change tmpImg to three-channel image
+	for (int i = 0; i < tmpImg.rows; i++) {
+		for (int j = 0; j < tmpImg.cols; j++) {
+			unsigned char tmp = tmpImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
 }

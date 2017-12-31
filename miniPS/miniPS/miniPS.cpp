@@ -1260,11 +1260,11 @@ void miniPS::on_slotHelloWorld_trigged() {
 		return;
 	}
 	myProcessor.resize(20, 20, NN, focusedLayer);
-	/*int res = myProcessor.helloWorld(focusedLayer);
+	int res = myProcessor.helloWorld(focusedLayer);
 	refreshImg();
 	QString report;
 	report.sprintf("Handwriting recognized : %d", res);
-	QMessageBox::about(NULL, "HelloWorld", report);*/
+	QMessageBox::about(NULL, "HelloWorld", report);
 }
 
 // Do hough line detection
@@ -1301,13 +1301,62 @@ void miniPS::on_slotMophoTabChange(int cur) {
 	mophoCurTab = cur;
 }
 
+
+
+/*************************************   Mophology   ****************************************************/
+
+Mat parseMat(QString inputStr) {
+	std::vector<std::vector<int>> set = {};
+	int j = 0;
+	for (int i = 0; i < inputStr.length(); i++) {
+		if (inputStr[i] == ';' && j != i) {
+			std::vector<int> tmpVec = {};
+			for (int k = j; k < i; k++) {
+				tmpVec.push_back(inputStr[k].digitValue());
+			}
+			set.push_back(tmpVec);
+			j = i + 1;
+		}
+		if (inputStr[i] == ';' && j == i) {
+			j++;
+		}
+	}
+	int iRows = set.size();
+	int iCols = set[0].size();
+	Mat B = Mat(iRows, iCols, CV_32FC1);
+	for (int i = 0; i < iRows; i++) {
+		for (int j = 0; j < iCols; j++) {
+			B.at<int>(i, j) = set[i][j];
+		}
+	}
+	return B;
+}
+
 // When the "dilation" btn is pressed
 void miniPS::on_slotDilation() {
 	if (myViews[focusedLayer]->scene() == NULL) {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B;
+	switch (this->mophoCurTab) {
+	case 0: { // 3*3
+	    
+		break;
+	}
+	case 1: { // 5*5
 
+		break;
+	}
+	case 2: { // m*n
+		QString text = ui.textEdit->toPlainText();
+	    B = parseMat(text);
+		myProcessor.dilation(B, anchorRow, anchorCol, focusedLayer);
+	}
+	}
+	//myProcessor.dilation(B, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1417,7 +1466,7 @@ void miniPS::on_slotGrayRecon() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-
+	myProcessor.test(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }

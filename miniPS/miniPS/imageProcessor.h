@@ -75,4 +75,12 @@ public:
 	void houghCircle(int idx);
 
 	int helloWorld(int idx);
+
+	void test(int idx);
+
+	void dilation(Mat B,int anchorRow, int anchorCol, int idx);
+	void erosion(Mat B, int idx);
+	void open(Mat B, int idx);
+	void close(Mat B, int idx);
+
 };
