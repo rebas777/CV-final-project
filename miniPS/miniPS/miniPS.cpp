@@ -21,9 +21,11 @@ miniPS::miniPS(QWidget *parent)
 	ui.GSAWidget->setVisible(false);
 	ui.UGSAWidget->setVisible(false);
 	ui.selfFilterWidget->setVisible(false);
+	ui.MophologyWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = 0;
+	mophoCurTab = 0;
 
 	// Initialize picked color
 	color1 = { 0,0,0 };
@@ -58,6 +60,7 @@ miniPS::miniPS(QWidget *parent)
 
 	//connect button control
 	connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_slotTabChang_trigged(int)));
+	connect(ui.tabWidget_2, SIGNAL(currentChanged(int)), this, SLOT(on_slotMophoTabChange(int)));
 	connect(ui.actionopen_image, SIGNAL(triggered()), this, SLOT(on_slotLoadImage_trigged()));
 	connect(ui.actionexit,SIGNAL(triggered()),this,SLOT(on_slotExit_trigged()));
 	connect(ui.actionminimize, SIGNAL(triggered()), this, SLOT(on_slotMin_trigged()));
@@ -127,7 +130,23 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.helloWorldBtn, SIGNAL(clicked()), this, SLOT(on_slotHelloWorld_trigged()));
 	connect(ui.colorSwitchBtn, SIGNAL(clicked()), this, SLOT(on_slotColorExchange()));
 	connect(ui.colorResetBtn, SIGNAL(clicked()), this, SLOT(in_slotColorReset()));
-	
+	connect(ui.actionhoughLine, SIGNAL(triggered()), this, SLOT(on_slotHoughLine()));
+	connect(ui.actionhoughCircle, SIGNAL(triggered()), this, SLOT(in_slotHoughCircle()));
+	connect(ui.actionmophology, SIGNAL(triggered()), this, SLOT(on_slotMophology_trigged()));
+	connect(ui.dilationBtn, SIGNAL(clicked()), this, SLOT(on_slotDilation()));
+	connect(ui.erosionBtn, SIGNAL(clicked()), this, SLOT(on_slotErosion()));
+	connect(ui.openBtn, SIGNAL(clicked()), this, SLOT(on_slotOpen()));
+	connect(ui.closeBtn, SIGNAL(clicked()), this, SLOT(on_slotClose()));
+	connect(ui.thinningBtn, SIGNAL(clicked()), this, SLOT(on_slotThinning()));
+	connect(ui.thickeningBtn, SIGNAL(clicked()), this, SLOT(on_slotThickening()));
+	connect(ui.distanceBtn, SIGNAL(clicked()), this, SLOT(on_slotDistanceTrans()));
+	connect(ui.skeletonBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeleton()));
+	connect(ui.SkeletonReconBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeletonRecon()));
+	connect(ui.binReconBtn, SIGNAL(clicked()), this, SLOT(on_slotBinRecon()));
+	connect(ui.reconstructionBtn, SIGNAL(clicked()), this, SLOT(on_slotGrayRecon()));
+	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed));
+
+
 	// Set shortcut for menu
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
@@ -1246,4 +1265,170 @@ void miniPS::on_slotHelloWorld_trigged() {
 	QString report;
 	report.sprintf("Handwriting recognized : %d", res);
 	QMessageBox::about(NULL, "HelloWorld", report);*/
+}
+
+// Do hough line detection
+void miniPS::on_slotHoughLine() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.houghLine(focusedLayer);
+	refreshImg();
+}
+
+// Do hough circle detection
+void miniPS::in_slotHoughCircle() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.houghCircle(focusedLayer);
+	refreshImg();
+}
+
+// When the "mophology" button is pressed
+void miniPS::on_slotMophology_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	ui.MophologyWidget->setVisible(true);
+}
+
+// When the mophology input approach tab changed
+void miniPS::on_slotMophoTabChange(int cur) {
+	mophoCurTab = cur;
+}
+
+// When the "dilation" btn is pressed
+void miniPS::on_slotDilation() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "erosion" btn is pressed
+void miniPS::on_slotErosion(){
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "open" btn is pressed
+void miniPS::on_slotOpen() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "close" btn is pressed
+void miniPS::on_slotClose() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "thinning" button is pressed
+void miniPS::on_slotThinning() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "thickening" button is pressed
+void miniPS::on_slotThickening() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "skeleton" button is pressed
+void miniPS::on_slotSkeleton() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "distance" button is pressed
+void miniPS::on_slotDistanceTrans() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "skeleton reconstruction" button is pressed
+void miniPS::on_slotSkeletonRecon() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "binary reconstruction" button is pressed
+void miniPS::on_slotBinRecon() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "reconstruction" button is pressed
+void miniPS::on_slotGrayRecon() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
+}
+
+// When the "watershed" button is pressed
+void miniPS::on_slotWatershed() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+	ui.MophologyWidget->setVisible(false);
 }

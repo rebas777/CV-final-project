@@ -2387,6 +2387,680 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="MophologyWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>461</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_50">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>10</y>
+        <width>121</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mophology:</string>
+      </property>
+     </widget>
+     <widget class="QTabWidget" name="tabWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>421</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::West</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>3*3</string>
+       </attribute>
+       <widget class="QDoubleSpinBox" name="inputMoph3_0">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>30</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_1">
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>30</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_2">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>30</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_3">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_4">
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_5">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_6">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>110</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_7">
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>110</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph3_8">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>110</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>5*5</string>
+       </attribute>
+       <widget class="QDoubleSpinBox" name="inputMoph5_0">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_1">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>10</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_2">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>10</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_3">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>10</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_4">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>10</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_5">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_6">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>40</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_7">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>40</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_8">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>40</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_9">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>40</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_10">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_11">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_12">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_13">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_14">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>70</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_15">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_16">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>100</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_17">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>100</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_18">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>100</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_19">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>100</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_20">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_21">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>130</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_22">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>130</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_23">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>130</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="inputMoph5_24">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>130</y>
+          <width>76</width>
+          <height>25</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>m*n</string>
+       </attribute>
+       <widget class="QTextEdit" name="textEdit">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>26</y>
+          <width>331</width>
+          <height>141</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="dilationBtn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>270</y>
+        <width>91</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>dilation</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="erosionBtn">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>270</y>
+        <width>91</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>erosion</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="openBtn">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>270</y>
+        <width>91</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>open</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="closeBtn">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>270</y>
+        <width>91</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>close</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="thinningBtn">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>320</y>
+        <width>101</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>thinning</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="thickeningBtn">
+      <property name="geometry">
+       <rect>
+        <x>225</x>
+        <y>320</y>
+        <width>101</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>thickening</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_8">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>305</y>
+        <width>421</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_51">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>330</y>
+        <width>121</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Binary Only:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="distanceBtn">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>320</y>
+        <width>101</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>distance</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="skeletonBtn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>360</y>
+        <width>81</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>skeleton</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="SkeletonReconBtn">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>360</y>
+        <width>211</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>skeletonReconstruction</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="binReconBtn">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>360</y>
+        <width>131</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>reconstruction</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>395</y>
+        <width>421</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_52">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>410</y>
+        <width>91</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Grayscale:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="reconstructionBtn">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>410</y>
+        <width>171</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>reconstruction</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="watershedBtn">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>410</y>
+        <width>151</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>watershed</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_53">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>230</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>anchor:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="inputAnchorRow">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>230</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="inputAnchorCol">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>230</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_54">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>230</y>
+        <width>41</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>row:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_55">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>230</y>
+        <width>51</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>col:</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -2475,6 +3149,13 @@
      <addaction name="actionlaplace"/>
      <addaction name="actioncanny"/>
     </widget>
+    <widget class="QMenu" name="menuhough">
+     <property name="title">
+      <string>hough</string>
+     </property>
+     <addaction name="actionhoughLine"/>
+     <addaction name="actionhoughCircle"/>
+    </widget>
     <addaction name="actionundo"/>
     <addaction name="actionclean_all_layers"/>
     <addaction name="menucolor_operation"/>
@@ -2485,8 +3166,8 @@
     <addaction name="actionrotate"/>
     <addaction name="menugrayscale_adjustment"/>
     <addaction name="menuedge_detection"/>
-    <addaction name="actionbinary_mopholo"/>
-    <addaction name="actiongrayscale_mophology"/>
+    <addaction name="menuhough"/>
+    <addaction name="actionmophology"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -2682,14 +3363,84 @@
     <string>sobelXY</string>
    </property>
   </action>
-  <action name="actionbinary_mopholo">
-   <property name="text">
-    <string>binary mophology</string>
-   </property>
-  </action>
   <action name="actiongrayscale_mophology">
    <property name="text">
     <string>grayscale mophology</string>
+   </property>
+  </action>
+  <action name="actionhoughLine">
+   <property name="text">
+    <string>houghLine</string>
+   </property>
+  </action>
+  <action name="actionhoughCircle">
+   <property name="text">
+    <string>houghCircle</string>
+   </property>
+  </action>
+  <action name="actiondilation">
+   <property name="text">
+    <string>dilation</string>
+   </property>
+  </action>
+  <action name="actionerosion">
+   <property name="text">
+    <string>erosion</string>
+   </property>
+  </action>
+  <action name="actionopen">
+   <property name="text">
+    <string>open</string>
+   </property>
+  </action>
+  <action name="actionclose">
+   <property name="text">
+    <string>close</string>
+   </property>
+  </action>
+  <action name="actionthinning_binary">
+   <property name="text">
+    <string>thinning(binary only)</string>
+   </property>
+  </action>
+  <action name="actionthickening_binary_only">
+   <property name="text">
+    <string>thickening(binary only)</string>
+   </property>
+  </action>
+  <action name="actiondistance_transform_binary_only">
+   <property name="text">
+    <string>distance transform(binary only)</string>
+   </property>
+  </action>
+  <action name="actionskeleton_binary_only">
+   <property name="text">
+    <string>skeleton(binary only)</string>
+   </property>
+  </action>
+  <action name="actionskeleton_reconstruction_binary_only">
+   <property name="text">
+    <string>skeleton reconstruction(binary only)</string>
+   </property>
+  </action>
+  <action name="actionwatershed">
+   <property name="text">
+    <string>watershed</string>
+   </property>
+  </action>
+  <action name="actionbinary">
+   <property name="text">
+    <string>binary</string>
+   </property>
+  </action>
+  <action name="actiongrayscale">
+   <property name="text">
+    <string>grayscale</string>
+   </property>
+  </action>
+  <action name="actionmophology">
+   <property name="text">
+    <string>mophology</string>
    </property>
   </action>
  </widget>

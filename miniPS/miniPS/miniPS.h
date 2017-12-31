@@ -50,6 +50,8 @@ private:
 	// Picked colors
 	std::vector<int> color1, color2;
 
+	int mophoCurTab;
+
 	void refreshImg();
 
 
@@ -123,4 +125,22 @@ void on_slotCanny_trigged();
 void on_slotHelloWorld_trigged();
 void on_slotColorExchange();
 void in_slotColorReset();
+void on_slotHoughLine();
+void in_slotHoughCircle();
+void on_slotMophology_trigged();
+void on_slotMophoTabChange(int cur);
+void on_slotDilation();
+void on_slotErosion();
+void on_slotOpen();
+void on_slotClose();
+void on_slotThinning();
+void on_slotThickening();
+void on_slotSkeleton();
+void on_slotSkeletonRecon();
+void on_slotDistanceTrans();
+void on_slotBinRecon();
+void on_slotGrayRecon();
+void on_slotWatershed();
+
+
 };

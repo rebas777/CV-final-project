@@ -70,5 +70,9 @@ public:
 
 	void canny(int idx);
 
+	void houghLine(int idx);
+
+	void houghCircle(int idx);
+
 	int helloWorld(int idx);
 };
