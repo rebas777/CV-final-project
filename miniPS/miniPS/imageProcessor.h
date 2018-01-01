@@ -79,8 +79,14 @@ public:
 	void test(int idx);
 
 	void dilation(Mat B,int anchorRow, int anchorCol, int idx);
-	void erosion(Mat B, int idx);
-	void open(Mat B, int idx);
-	void close(Mat B, int idx);
+	void erosion(Mat B, int anchorRow, int anchorCol, int idx);
+	void open(Mat B, int anchorRow, int anchorCol, int idx);
+	void close(Mat B, int anchorRow, int anchorCol, int idx);
+
+	void hitOrMiss(Mat B, int anchorRow, int anchorCol, int idx);
+	void thinning(Mat B, int anchorRow, int anchorCol, int idx);
+	void thickening(Mat B, int anchorRow, int anchorCol, int idx);
+
+	void distanceTrans(int algo, int idx);
 
 };

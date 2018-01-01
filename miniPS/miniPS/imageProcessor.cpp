@@ -1146,7 +1146,6 @@ void ImageProcessor::dilation(Mat B, int anchorRow, int anchorCol, int idx) {
 		qDebug("Bad anchor !");
 		return;
 	}
-	commit(idx);
 	Mat grayImg = images[idx].clone();
 	cvtColor(grayImg, grayImg, CV_RGB2GRAY);
 	// 先转化成灰度图
@@ -1177,6 +1176,198 @@ void ImageProcessor::dilation(Mat B, int anchorRow, int anchorCol, int idx) {
 	for (int i = 0; i < tmpImg.rows; i++) {
 		for (int j = 0; j < tmpImg.cols; j++) {
 			unsigned char tmp = tmpImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}
+
+void ImageProcessor::erosion(Mat B, int anchorRow, int anchorCol, int idx) {
+	if (anchorRow >= B.rows || anchorRow < 0 || anchorCol >= B.cols || anchorCol < 0) {
+		qDebug("Bad anchor !");
+		return;
+	}
+	Mat grayImg = images[idx].clone();
+	cvtColor(grayImg, grayImg, CV_RGB2GRAY);
+	// 先转化成灰度图
+	Mat tmpImg = grayImg.clone();
+	for (int i = 0; i < grayImg.rows; i++) {
+		for (int j = 0; j < grayImg.cols; j++) {
+			int min = 255;
+			for (int m = 0; m < B.rows; m++) {
+				int B_row = i - anchorRow + m;
+				if (B_row < 0 || B_row >= grayImg.rows) {
+					continue; // 越界检测
+				}
+				for (int n = 0; n < B.cols; n++) {
+					int B_col = j - anchorCol + n;
+					if (B_col < 0 || B_col >= grayImg.cols) {
+						continue;
+					}
+					int tmp = grayImg.at<uchar>(B_row, B_col);
+					if (tmp < min && B.at<int>(m, n) == 1) {
+						min = tmp;
+					}
+				}
+			}
+			tmpImg.at<uchar>(i, j) = min;
+		}
+	}
+	// change tmpImg to three-channel image
+	for (int i = 0; i < tmpImg.rows; i++) {
+		for (int j = 0; j < tmpImg.cols; j++) {
+			unsigned char tmp = tmpImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}
+
+void ImageProcessor::open(Mat B, int anchorRow, int anchorCol, int idx) {
+	this->erosion(B, anchorRow, anchorCol, idx);
+	this->dilation(B, anchorRow, anchorCol, idx);
+}
+
+void ImageProcessor::close(Mat B, int anchorRow, int anchorCol, int idx) {
+	this->dilation(B, anchorRow, anchorCol, idx);
+	this->erosion(B, anchorRow, anchorCol, idx);
+}
+
+
+// 下面的仅限二值图的操作，必须保证调用之前 image[idx] 已经是一个二值图
+void ImageProcessor::hitOrMiss(Mat B, int anchorRow, int anchorCol, int idx) {
+	if (anchorRow >= B.rows || anchorRow < 0 || anchorCol >= B.cols || anchorCol < 0) {
+		qDebug("Bad anchor !");
+		return;
+	}
+	Mat binImg = images[idx].clone();
+	std::vector<Mat>channels;
+	split(binImg, channels);
+	binImg = channels.at(0);// 取单通道
+	Mat tmpImg = binImg.clone();
+	for (int i = 0; i < binImg.rows; i++) {
+		for (int j = 0; j < binImg.cols; j++) {
+			bool match = true;
+			for (int m = 0; m < B.rows; m++) {
+				int B_row = i - anchorRow + m;
+				if (B_row < 0 || B_row >= binImg.rows) {
+					continue; // 越界检测
+				}
+				for (int n = 0; n < B.cols; n++) {
+					int B_col = j - anchorCol + n;
+					if (B_col < 0 || B_col >= binImg.cols) {
+						continue;
+					}
+					int tmp = binImg.at<uchar>(B_row, B_col);
+					if (!(tmp == 0 && B.at<int>(m, n) == 0) 
+						&& !(tmp == 255 && B.at<int>(m,n) == 1)) {
+						match = false;
+					}
+				}
+			}
+			tmpImg.at<uchar>(i, j) = match ? 0 : 255;
+		}
+	}
+	// change tmpImg to three-channel image
+	for (int i = 0; i < tmpImg.rows; i++) {
+		for (int j = 0; j < tmpImg.cols; j++) {
+			unsigned char tmp = tmpImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}// 调用过之后，images[idx] 变为击中击不中之后的图片
+
+void ImageProcessor::thinning(Mat B, int anchorRow, int anchorCol, int idx) {
+	
+	this->toBinary(true, 0, 0, idx); // transform to binary image(use otsu)
+	commit(idx);
+	this->hitOrMiss(B, anchorRow, anchorCol, idx);
+	Mat tmp = imageBackups[idx];
+	// DO: tmp - images[idx]  (tmp is the src image, images[idx] is the hitormiss image)
+	for (int i = 0; i < tmp.rows; i++) {
+		for (int j = 0; j < tmp.cols; j++) {
+			if (images[idx].at<Vec3b>(i, j)[0] == 0) {
+				images[idx].at<Vec3b>(i, j)[0] = 255;
+				images[idx].at<Vec3b>(i, j)[1] = 255;
+				images[idx].at<Vec3b>(i, j)[2] = 255;
+			}
+			else {
+				images[idx].at<Vec3b>(i, j)[0] = tmp.at<Vec3b>(i, j)[0];
+				images[idx].at<Vec3b>(i, j)[1] = tmp.at<Vec3b>(i, j)[1];
+				images[idx].at<Vec3b>(i, j)[2] = tmp.at<Vec3b>(i, j)[2];
+			}
+		}
+	}
+}
+
+void ImageProcessor::thickening(Mat B, int anchorRow, int anchorCol, int idx) {
+	this->toBinary(true, 0, 0, idx);
+	commit(idx);
+	this->hitOrMiss(B, anchorRow, anchorCol, idx);
+	Mat tmp = imageBackups[idx];
+	// DO: tmp U images[idx]
+	for (int i = 0; i < tmp.rows; i++) {
+		for (int j = 0; j < tmp.cols; j++) {
+			if (images[idx].at<Vec3b>(i, j)[0] == 0) {
+				images[idx].at<Vec3b>(i, j)[0] = 0;
+				images[idx].at<Vec3b>(i, j)[1] = 0;
+				images[idx].at<Vec3b>(i, j)[2] = 0;
+			}
+			else {
+				images[idx].at<Vec3b>(i, j)[0] = tmp.at<Vec3b>(i, j)[0];
+				images[idx].at<Vec3b>(i, j)[1] = tmp.at<Vec3b>(i, j)[1];
+				images[idx].at<Vec3b>(i, j)[2] = tmp.at<Vec3b>(i, j)[2];
+			}
+		}
+	}
+}
+
+
+inline float calcDistance(int row1, int col1, int row2, int col2, int algo) {
+	switch (algo) {
+	case 0: { // Euclidean Distance
+		return sqrt((row1 - row2)*(row1 - row2) + (col1 - col2)*(col1 - col2));
+	}
+	case 1: { // City Block Distance
+		return abs(row1 - row2) + abs(col1 - col2);
+	}
+	case 2: { // Chessboard Distance
+		return max(abs(row1 - row2), abs(col1 - col2));
+	}
+	}
+}
+
+void ImageProcessor::distanceTrans(int algo, int idx) {
+	commit(idx);
+	Mat binImg = images[idx].clone();
+	std::vector<Mat>channels;
+	split(binImg, channels);
+	binImg = channels.at(0);// 取单通道
+	for (int i = 0; i < binImg.rows; i++) { // for every point in foreground
+		for (int j = 0; j < binImg.cols; j++) {
+			if (binImg.at<uchar>(i, j) == 255) { // Is foreground
+				float minDistance = 255;
+				for (int m = 0; m < binImg.rows; m++) { // for every point in background
+					for (int n = 0; n < binImg.cols; n++) {
+						int tmpVal = binImg.at<uchar>(m, n);
+						if (tmpVal == 0 ) { // Is background
+							float tmpDis = calcDistance(i, j, m, n, algo);
+							if (tmpDis < minDistance) {
+								minDistance = tmpDis;
+							}
+						}
+					}
+				}
+				binImg.at<uchar>(i, j) = (int)minDistance;
+				
+			}
+		}
+	}
+	// change tmpImg to three-channel image
+	for (int i = 0; i < binImg.rows; i++) {
+		for (int j = 0; j < binImg.cols; j++) {
+			unsigned char tmp = binImg.at<uchar>(i, j);
 			Vec3b tmpVec = { tmp, tmp, tmp };
 			images[idx].at<Vec3b>(i, j) = tmpVec;
 		}

@@ -24,8 +24,8 @@ miniPS::miniPS(QWidget *parent)
 	ui.MophologyWidget->setVisible(false);
 
 	//init focused layer
-	focusedLayer = 0;
-	mophoCurTab = 0;
+	focusedLayer = ui.tabWidget->currentIndex();
+	mophoCurTab = ui.tabWidget_2->currentIndex();
 
 	// Initialize picked color
 	color1 = { 0,0,0 };
@@ -151,6 +151,7 @@ miniPS::miniPS(QWidget *parent)
 	ui.actionsave_image->setShortcut(Qt::CTRL | Qt::Key_S);
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
 	ui.actionundo->setShortcut(Qt::CTRL | Qt::Key_Z);
+	ui.actionmophology->setShortcut(Qt::CTRL | Qt::Key_M);
 
 	// Set zoom slider
 	ui.horizontalSlider->setOrientation(Qt::Horizontal);
@@ -1332,18 +1333,11 @@ Mat parseMat(QString inputStr) {
 	return B;
 }
 
-// When the "dilation" btn is pressed
-void miniPS::on_slotDilation() {
-	if (myViews[focusedLayer]->scene() == NULL) {
-		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
-		return;
-	}
-	int anchorRow = ui.inputAnchorRow->value();
-	int anchorCol = ui.inputAnchorCol->value();
+Mat miniPS::parseInputKernel() {
 	Mat B;
 	switch (this->mophoCurTab) {
 	case 0: { // 3*3
-	    
+
 		break;
 	}
 	case 1: { // 5*5
@@ -1352,11 +1346,24 @@ void miniPS::on_slotDilation() {
 	}
 	case 2: { // m*n
 		QString text = ui.textEdit->toPlainText();
-	    B = parseMat(text);
-		myProcessor.dilation(B, anchorRow, anchorCol, focusedLayer);
+		B = parseMat(text);
 	}
 	}
-	//myProcessor.dilation(B, focusedLayer);
+	return B;
+}
+
+// When the "dilation" btn is pressed
+void miniPS::on_slotDilation() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
+	
+	myProcessor.commit(focusedLayer);
+	myProcessor.dilation(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1367,7 +1374,12 @@ void miniPS::on_slotErosion(){
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
 
+	myProcessor.commit(focusedLayer);
+	myProcessor.erosion(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1378,7 +1390,12 @@ void miniPS::on_slotOpen() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
 
+	myProcessor.commit(focusedLayer);
+	myProcessor.open(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1389,7 +1406,12 @@ void miniPS::on_slotClose() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
 
+	myProcessor.commit(focusedLayer);
+	myProcessor.close(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1400,7 +1422,11 @@ void miniPS::on_slotThinning() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
 
+	myProcessor.thinning(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1411,7 +1437,11 @@ void miniPS::on_slotThickening() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
 
+	myProcessor.thickening(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1434,6 +1464,7 @@ void miniPS::on_slotDistanceTrans() {
 		return;
 	}
 
+	myProcessor.distanceTrans(0, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }

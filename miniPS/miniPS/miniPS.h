@@ -54,6 +54,8 @@ private:
 
 	void refreshImg();
 
+	Mat parseInputKernel();
+
 
 private slots:
 void on_slotUndo_trigged();
