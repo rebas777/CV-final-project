@@ -79,6 +79,7 @@ public:
 	void test(int idx);
 
 	void dilation(Mat B,int anchorRow, int anchorCol, int idx);
+	void dilation(Mat &A, Mat B, int anchorRow, int anchorCol);
 	void erosion(Mat B, int anchorRow, int anchorCol, int idx);
 	void open(Mat B, int anchorRow, int anchorCol, int idx);
 	void close(Mat B, int anchorRow, int anchorCol, int idx);
@@ -88,5 +89,12 @@ public:
 	void thickening(Mat B, int anchorRow, int anchorCol, int idx);
 
 	void distanceTrans(int algo, int idx);
+
+	void binRecon(Mat K, int anchorRow, int anchorCol, int idx);
+
+	void reconstruction(Mat &marker, Mat mask);
+
+	Mat skeleton(Mat &srcin);
+	void extractSkeleton(int idx);
 
 };

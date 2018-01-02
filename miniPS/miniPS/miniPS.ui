@@ -2913,7 +2913,7 @@
      <widget class="QPushButton" name="skeletonBtn">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>130</x>
         <y>360</y>
         <width>81</width>
         <height>34</height>
@@ -2926,7 +2926,7 @@
      <widget class="QPushButton" name="SkeletonReconBtn">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>220</x>
         <y>360</y>
         <width>211</width>
         <height>34</height>
@@ -2934,19 +2934,6 @@
       </property>
       <property name="text">
        <string>skeletonReconstruction</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="binReconBtn">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>360</y>
-        <width>131</width>
-        <height>34</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>reconstruction</string>
       </property>
      </widget>
      <widget class="Line" name="line_9">

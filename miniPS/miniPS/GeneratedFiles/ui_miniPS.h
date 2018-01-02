@@ -316,7 +316,6 @@ public:
     QPushButton *distanceBtn;
     QPushButton *skeletonBtn;
     QPushButton *SkeletonReconBtn;
-    QPushButton *binReconBtn;
     QFrame *line_9;
     QLabel *label_52;
     QPushButton *reconstructionBtn;
@@ -1242,13 +1241,10 @@ public:
         distanceBtn->setGeometry(QRect(330, 320, 101, 34));
         skeletonBtn = new QPushButton(MophologyWidget);
         skeletonBtn->setObjectName(QStringLiteral("skeletonBtn"));
-        skeletonBtn->setGeometry(QRect(10, 360, 81, 34));
+        skeletonBtn->setGeometry(QRect(130, 360, 81, 34));
         SkeletonReconBtn = new QPushButton(MophologyWidget);
         SkeletonReconBtn->setObjectName(QStringLiteral("SkeletonReconBtn"));
-        SkeletonReconBtn->setGeometry(QRect(90, 360, 211, 34));
-        binReconBtn = new QPushButton(MophologyWidget);
-        binReconBtn->setObjectName(QStringLiteral("binReconBtn"));
-        binReconBtn->setGeometry(QRect(300, 360, 131, 34));
+        SkeletonReconBtn->setGeometry(QRect(220, 360, 211, 34));
         line_9 = new QFrame(MophologyWidget);
         line_9->setObjectName(QStringLiteral("line_9"));
         line_9->setGeometry(QRect(10, 395, 421, 16));
@@ -1564,7 +1560,6 @@ public:
         distanceBtn->setText(QApplication::translate("miniPSClass", "distance", Q_NULLPTR));
         skeletonBtn->setText(QApplication::translate("miniPSClass", "skeleton", Q_NULLPTR));
         SkeletonReconBtn->setText(QApplication::translate("miniPSClass", "skeletonReconstruction", Q_NULLPTR));
-        binReconBtn->setText(QApplication::translate("miniPSClass", "reconstruction", Q_NULLPTR));
         label_52->setText(QApplication::translate("miniPSClass", "Grayscale:", Q_NULLPTR));
         reconstructionBtn->setText(QApplication::translate("miniPSClass", "reconstruction", Q_NULLPTR));
         watershedBtn->setText(QApplication::translate("miniPSClass", "watershed", Q_NULLPTR));

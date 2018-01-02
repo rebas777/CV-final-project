@@ -1182,6 +1182,47 @@ void ImageProcessor::dilation(Mat B, int anchorRow, int anchorCol, int idx) {
 	}
 }
 
+void ImageProcessor::dilation(Mat &A, Mat B, int anchorRow, int anchorCol) {
+	if (anchorRow >= B.rows || anchorRow < 0 || anchorCol >= B.cols || anchorCol < 0) {
+		qDebug("Bad anchor !");
+		return;
+	}
+	Mat grayImg = A.clone();
+	cvtColor(grayImg, grayImg, CV_RGB2GRAY);
+	// 先转化成灰度图
+	Mat tmpImg = grayImg.clone();
+	for (int i = 0; i < grayImg.rows; i++) {
+		for (int j = 0; j < grayImg.cols; j++) {
+			int max = 0;
+			for (int m = 0; m < B.rows; m++) {
+				int B_row = i - anchorRow + m;
+				if (B_row < 0 || B_row >= grayImg.rows) {
+					continue; // 越界检测
+				}
+				for (int n = 0; n < B.cols; n++) {
+					int B_col = j - anchorCol + n;
+					if (B_col < 0 || B_col >= grayImg.cols) {
+						continue;
+					}
+					int tmp = grayImg.at<uchar>(B_row, B_col);
+					if (tmp > max && B.at<int>(m, n) == 1) {
+						max = tmp;
+					}
+				}
+			}
+			tmpImg.at<uchar>(i, j) = max;
+		}
+	}
+	// change tmpImg to three-channel image
+	for (int i = 0; i < tmpImg.rows; i++) {
+		for (int j = 0; j < tmpImg.cols; j++) {
+			unsigned char tmp = tmpImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			A.at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}
+
 void ImageProcessor::erosion(Mat B, int anchorRow, int anchorCol, int idx) {
 	if (anchorRow >= B.rows || anchorRow < 0 || anchorCol >= B.cols || anchorCol < 0) {
 		qDebug("Bad anchor !");
@@ -1205,7 +1246,7 @@ void ImageProcessor::erosion(Mat B, int anchorRow, int anchorCol, int idx) {
 						continue;
 					}
 					int tmp = grayImg.at<uchar>(B_row, B_col);
-					if (tmp < min && B.at<int>(m, n) == 1) {
+					if (tmp < min && B.at<int>(m, n) == 1) { // 膨胀腐蚀这里对卷积和里的 0 和 1 的理解并非黑与白，而是无与有的对应。
 						min = tmp;
 					}
 				}
@@ -1259,7 +1300,7 @@ void ImageProcessor::hitOrMiss(Mat B, int anchorRow, int anchorCol, int idx) {
 						continue;
 					}
 					int tmp = binImg.at<uchar>(B_row, B_col);
-					if (!(tmp == 0 && B.at<int>(m, n) == 0) 
+					if (!(tmp == 0 && B.at<int>(m, n) == 0) // hitOrMiss这里对卷积核里 1 和 0 的理解分别对应白和黑
 						&& !(tmp == 255 && B.at<int>(m,n) == 1)) {
 						match = false;
 					}
@@ -1368,6 +1409,233 @@ void ImageProcessor::distanceTrans(int algo, int idx) {
 	for (int i = 0; i < binImg.rows; i++) {
 		for (int j = 0; j < binImg.cols; j++) {
 			unsigned char tmp = binImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}
+
+inline bool imgEqual(Mat A, Mat B) { // 对比单通道灰度图是否 Van 全一致
+	if (A.type() != B.type() || A.rows != B.rows || A.cols != B.cols) {
+		return false;
+	}
+	int iRow = A.rows;
+	int iCol = A.cols;
+	for (int i = 0; i < iRow; i++) {
+		for (int j = 0; j < iCol; j++) {
+			int a = A.at<uchar>(i, j);
+			int b = B.at<uchar>(i, j);
+			if (a != b) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+void ImageProcessor::binRecon(Mat K, int anchorRow, int anchorCol, int idx) {
+	Mat V = images[idx]; // backup origin image V
+	Mat Ki = Mat(3, 3, CV_32FC1);
+	Ki.at<int>(0,0) = 1;
+	Ki.at<int>(0,1) = 1;
+	Ki.at<int>(0,2) = 1;
+	Ki.at<int>(1,0) = 1;
+	Ki.at<int>(1,1) = 1;
+	Ki.at<int>(1,2) = 1;
+	Ki.at<int>(2,0) = 1;
+	Ki.at<int>(2,1) = 1;
+	Ki.at<int>(2,2) = 1;
+	this->open(K, anchorRow, anchorCol, idx); // images[idx] is M
+	Mat T;
+	do {
+		T = images[idx];
+		this->dilation(Ki, 1, 1, idx);
+		for (int i = 0; i < images[idx].rows; i++) {
+			for (int j = 0; j < images[idx].cols; j++) { // M交V
+				if (V.at<Vec3b>(i, j)[0] != 0) {
+					images[idx].at<Vec3b>(i, j)[0] = 255;
+					images[idx].at<Vec3b>(i, j)[1] = 255;
+					images[idx].at<Vec3b>(i, j)[2] = 255;
+				}
+			}
+		}
+	} while (!imgEqual(images[idx], T));
+}
+
+void ImageProcessor::reconstruction(Mat &marker, Mat mask) {
+	// check size equal
+	if (marker.type() != mask.type() || marker.rows != mask.rows || marker.cols != mask.cols) {
+		qDebug("Bad input image: marker and mask are not the same size !");
+		return;
+	}
+	Mat T;
+	Mat Ki = Mat(3, 3, CV_32FC1);
+	Ki.at<int>(0, 0) = 1;
+	Ki.at<int>(0, 1) = 1;
+	Ki.at<int>(0, 2) = 1;
+	Ki.at<int>(1, 0) = 1;
+	Ki.at<int>(1, 1) = 1;
+	Ki.at<int>(1, 2) = 1;
+	Ki.at<int>(2, 0) = 1;
+	Ki.at<int>(2, 1) = 1;
+	Ki.at<int>(2, 2) = 1;
+	do {
+		T = marker.clone();
+		this->dilation(marker, Ki, 1, 1);
+		for (int i = 0; i < marker.rows; i++) { // marker 交 mask
+			for (int j = 0; j < marker.cols; j++) {
+				Vec3b tmp1 = marker.at<Vec3b>(i, j);
+				Vec3b tmp2 = mask.at<Vec3b>(i, j);
+				if (tmp1[0] < tmp2[0]){
+					marker.at<Vec3b>(i, j) = tmp1;
+				}
+				else {
+					marker.at<Vec3b>(i, j) = tmp2;
+				}
+			}
+		}
+	} while (!imgEqual(T, marker));
+}
+
+Mat ImageProcessor::skeleton(Mat &srcin) {
+	Mat& src = srcin.clone();
+	cv::Mat dst = src.clone();
+	while (1) {
+		cv::Mat tempImage = src.clone();
+		for (int i = 1; i < src.rows - 1; i++) {
+			for (int j = 1; j < src.cols - 1; j++) {
+				if (src.at<uchar>(i, j) == 255) {
+					uchar g2 = src.at<uchar>(i - 1, j), g3 = src.at<uchar>(i - 1, j + 1),
+						g4 = src.at<uchar>(i, j + 1), g5 = src.at<uchar>(i + 1, j + 1),
+						g6 = src.at<uchar>(i + 1, j), g7 = src.at<uchar>(i + 1, j - 1),
+						g8 = src.at<uchar>(i, j - 1), g9 = src.at<uchar>(i - 1, j - 1);
+					//cond 1
+					int count = (g2 & 1) + (g3 & 1) + (g4 & 1) + (g5 & 1) + (g6 & 1) + (g7 & 1) + (g8 & 1) + (g9 & 1);
+					if (!(count >= 2 && count <= 6)) {
+						continue;
+					}
+					//cond 2
+					std::vector<int>tempV;
+					tempV.push_back(g2 & 1);
+					tempV.push_back(g3 & 1);
+					tempV.push_back(g4 & 1);
+					tempV.push_back(g5 & 1);
+					tempV.push_back(g6 & 1);
+					tempV.push_back(g7 & 1);
+					tempV.push_back(g8 & 1);
+					tempV.push_back(g9 & 1);
+					count = 0;
+					for (int k = 0; k < 8; k++) {
+						if (k == 7) {
+							if (tempV[7] == 0 && tempV[0] == 1) {
+								count++;
+							}
+							continue;
+						}
+						if (tempV[k] == 0 && tempV[k + 1] == 1) {
+							count++;
+						}
+					}
+					if (count != 1) {
+						continue;
+					}
+					//cond 3
+					if (g2*g4*g6 != 0) {
+						continue;
+					}
+					//cond 4
+					if (g4*g6*g8 != 0) {
+						continue;
+					}
+					tempImage.at<uchar>(i, j) = 0;
+				}
+			}
+		}
+		cv::Mat resImage = tempImage.clone();
+		for (int i = 1; i < tempImage.rows - 1; i++) {
+			for (int j = 1; j < tempImage.cols - 1; j++) {
+				if (tempImage.at<uchar>(i, j) == 255) {
+					uchar g2 = tempImage.at<uchar>(i - 1, j), g3 = tempImage.at<uchar>(i - 1, j + 1),
+						g4 = tempImage.at<uchar>(i, j + 1), g5 = tempImage.at<uchar>(i + 1, j + 1),
+						g6 = tempImage.at<uchar>(i + 1, j), g7 = tempImage.at<uchar>(i + 1, j - 1),
+						g8 = tempImage.at<uchar>(i, j - 1), g9 = tempImage.at<uchar>(i - 1, j - 1);
+					//cond 1
+					int count = (g2 & 1) + (g3 & 1) + (g4 & 1) + (g5 & 1) + (g6 & 1) + (g7 & 1) + (g8 & 1) + (g9 & 1);
+					if (!(count >= 2 && count <= 6)) {
+						continue;
+					}
+					//cond 2
+					std::vector<int>tempV;
+					tempV.push_back(g2 & 1);
+					tempV.push_back(g3 & 1);
+					tempV.push_back(g4 & 1);
+					tempV.push_back(g5 & 1);
+					tempV.push_back(g6 & 1);
+					tempV.push_back(g7 & 1);
+					tempV.push_back(g8 & 1);
+					tempV.push_back(g9 & 1);
+					count = 0;
+					for (int k = 0; k < 8; k++) {
+						if (k == 7) {
+							if (tempV[7] == 0 && tempV[0] == 1) {
+								count++;
+							}
+							continue;
+						}
+						if (tempV[k] == 0 && tempV[k + 1] == 1) {
+							count++;
+						}
+					}
+					if (count != 1) {
+						continue;
+					}
+					//cond 3
+					if (g2*g4*g8 != 0) {
+						continue;
+					}
+					//cond 4
+					if (g2*g6*g8 != 0) {
+						continue;
+					}
+					resImage.at<uchar>(i, j) = 0;
+				}
+			}
+		}
+		bool flag = false;
+		for (int i = 1; i < src.rows - 1; i++) {
+			if (flag) {
+				break;
+			}
+			for (int j = 1; j < src.cols - 1; j++) {
+				if (src.at<uchar>(i, j) != resImage.at<uchar>(i, j)) {
+					flag = true;
+					break;
+				}
+			}
+		}
+		if (!flag) {
+			dst = src.clone();
+			break;
+		}
+		else {
+			src = resImage.clone();
+		}
+	}
+	return dst;
+}
+
+void ImageProcessor::extractSkeleton(int idx) {
+	this->toBinary(true, 0, 0, idx); // transform to binary image(use otsu)
+	Mat binImg = images[idx].clone();
+	std::vector<Mat>channels;
+	split(binImg, channels);
+	binImg = channels.at(0);// 取单通道
+	Mat resImg = this->skeleton(binImg);
+
+	// change resImg to three-channel image
+	for (int i = 0; i < resImg.rows; i++) {
+		for (int j = 0; j < resImg.cols; j++) {
+			unsigned char tmp = resImg.at<uchar>(i, j);
 			Vec3b tmpVec = { tmp, tmp, tmp };
 			images[idx].at<Vec3b>(i, j) = tmpVec;
 		}

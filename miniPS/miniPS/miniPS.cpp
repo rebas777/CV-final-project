@@ -142,7 +142,6 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.distanceBtn, SIGNAL(clicked()), this, SLOT(on_slotDistanceTrans()));
 	connect(ui.skeletonBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeleton()));
 	connect(ui.SkeletonReconBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeletonRecon()));
-	connect(ui.binReconBtn, SIGNAL(clicked()), this, SLOT(on_slotBinRecon()));
 	connect(ui.reconstructionBtn, SIGNAL(clicked()), this, SLOT(on_slotGrayRecon()));
 	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed));
 
@@ -1452,7 +1451,9 @@ void miniPS::on_slotSkeleton() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	myProcessor.commit(focusedLayer);
 
+	myProcessor.extractSkeleton(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1486,18 +1487,27 @@ void miniPS::on_slotBinRecon() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	int anchorRow = ui.inputAnchorRow->value();
+	int anchorCol = ui.inputAnchorCol->value();
+	Mat B = parseInputKernel();
+	myProcessor.commit(focusedLayer);
 
+	myProcessor.binRecon(B, anchorRow, anchorCol, focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
 
 // When the "reconstruction" button is pressed
 void miniPS::on_slotGrayRecon() {
-	if (myViews[focusedLayer]->scene() == NULL) {
+	if (myViews[focusedLayer]->scene() == NULL 
+		|| myViews[(focusedLayer + 1) % 5]->scene() == NULL) {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-	myProcessor.test(focusedLayer);
+	
+	myProcessor.commit(focusedLayer);
+	myProcessor.reconstruction(myProcessor.images[focusedLayer],
+		myProcessor.images[(focusedLayer + 1) % 5]);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
