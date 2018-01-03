@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
+#include <QDesktopServices>
 #include "ui_miniPS.h"
 #include "myView.h"
 #include "myScene.h"
@@ -144,5 +145,6 @@ void on_slotBinRecon();
 void on_slotGrayRecon();
 void on_slotWatershed();
 
+void openUrl(QString url);
 
 };

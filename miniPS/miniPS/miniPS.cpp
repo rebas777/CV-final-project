@@ -58,6 +58,9 @@ miniPS::miniPS(QWidget *parent)
 	ui.picked_color1->setStyleSheet("QLabel { background-color : white; color : blue; }");
 	ui.picked_color2->setStyleSheet("QLabel { background-color : black; color : blue; }");
 
+	// Set help label
+	ui.helpLabel->setText("<a href = https://www.jianshu.com/p/dad9c0199e4d >Document</a>");
+
 	//connect button control
 	connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(on_slotTabChang_trigged(int)));
 	connect(ui.tabWidget_2, SIGNAL(currentChanged(int)), this, SLOT(on_slotMophoTabChange(int)));
@@ -144,6 +147,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.SkeletonReconBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeletonRecon()));
 	connect(ui.reconstructionBtn, SIGNAL(clicked()), this, SLOT(on_slotGrayRecon()));
 	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed()));
+	connect(ui.helpLabel, SIGNAL(linkActivated(QString)), this, SLOT(openUrl(QString)));
 
 
 	// Set shortcut for menu
@@ -313,6 +317,11 @@ Mat QImage2cvMat(QImage image)
 		break;
 	}
 	return mat;
+}
+
+
+void miniPS::openUrl(QString url) {
+	QDesktopServices::openUrl(QUrl(url));
 }
 
 // When load image

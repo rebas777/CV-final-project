@@ -84,6 +84,7 @@ public:
     QAction *actionbinary;
     QAction *actiongrayscale;
     QAction *actionmophology;
+    QAction *actionDocument;
     QWidget *centralWidget;
     QPushButton *exitBtn;
     QGroupBox *groupBox;
@@ -325,6 +326,10 @@ public:
     QLabel *label_54;
     QLabel *label_55;
     QPushButton *watershedBtn;
+    QLabel *label_56;
+    QLabel *helpLabel;
+    QStatusBar *statusBar;
+    QToolBar *mainToolBar;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -339,9 +344,6 @@ public:
     QMenu *menuhough;
     QMenu *menuSettings;
     QMenu *menuWindow_mode;
-    QMenu *menuHelp;
-    QStatusBar *statusBar;
-    QToolBar *mainToolBar;
 
     void setupUi(QMainWindow *miniPSClass)
     {
@@ -442,6 +444,8 @@ public:
         actiongrayscale->setObjectName(QStringLiteral("actiongrayscale"));
         actionmophology = new QAction(miniPSClass);
         actionmophology->setObjectName(QStringLiteral("actionmophology"));
+        actionDocument = new QAction(miniPSClass);
+        actionDocument->setObjectName(QStringLiteral("actionDocument"));
         centralWidget = new QWidget(miniPSClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         exitBtn = new QPushButton(centralWidget);
@@ -1347,7 +1351,19 @@ public:
         watershedBtn = new QPushButton(MophologyWidget);
         watershedBtn->setObjectName(QStringLiteral("watershedBtn"));
         watershedBtn->setGeometry(QRect(280, 410, 151, 34));
+        label_56 = new QLabel(centralWidget);
+        label_56->setObjectName(QStringLiteral("label_56"));
+        label_56->setGeometry(QRect(10, 850, 101, 18));
+        helpLabel = new QLabel(centralWidget);
+        helpLabel->setObjectName(QStringLiteral("helpLabel"));
+        helpLabel->setGeometry(QRect(10, 870, 81, 18));
         miniPSClass->setCentralWidget(centralWidget);
+        statusBar = new QStatusBar(miniPSClass);
+        statusBar->setObjectName(QStringLiteral("statusBar"));
+        miniPSClass->setStatusBar(statusBar);
+        mainToolBar = new QToolBar(miniPSClass);
+        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
+        miniPSClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
         menuBar = new QMenuBar(miniPSClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 1920, 30));
@@ -1377,20 +1393,11 @@ public:
         menuSettings->setObjectName(QStringLiteral("menuSettings"));
         menuWindow_mode = new QMenu(menuSettings);
         menuWindow_mode->setObjectName(QStringLiteral("menuWindow_mode"));
-        menuHelp = new QMenu(menuBar);
-        menuHelp->setObjectName(QStringLiteral("menuHelp"));
         miniPSClass->setMenuBar(menuBar);
-        statusBar = new QStatusBar(miniPSClass);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
-        miniPSClass->setStatusBar(statusBar);
-        mainToolBar = new QToolBar(miniPSClass);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        miniPSClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
         menuBar->addAction(menuSettings->menuAction());
-        menuBar->addAction(menuHelp->menuAction());
         menuFile->addAction(actionopen_image);
         menuFile->addSeparator();
         menuFile->addAction(actionsave_image);
@@ -1506,6 +1513,7 @@ public:
         actionbinary->setText(QApplication::translate("miniPSClass", "binary", Q_NULLPTR));
         actiongrayscale->setText(QApplication::translate("miniPSClass", "grayscale", Q_NULLPTR));
         actionmophology->setText(QApplication::translate("miniPSClass", "mophology", Q_NULLPTR));
+        actionDocument->setText(QApplication::translate("miniPSClass", "Document", Q_NULLPTR));
         exitBtn->setText(QApplication::translate("miniPSClass", "QUIT", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("miniPSClass", "Inpector", Q_NULLPTR));
         zoomOutBtn->setText(QApplication::translate("miniPSClass", "-", Q_NULLPTR));
@@ -1639,6 +1647,8 @@ public:
         label_54->setText(QApplication::translate("miniPSClass", "row:", Q_NULLPTR));
         label_55->setText(QApplication::translate("miniPSClass", "col:", Q_NULLPTR));
         watershedBtn->setText(QApplication::translate("miniPSClass", "watershed", Q_NULLPTR));
+        label_56->setText(QApplication::translate("miniPSClass", "miniPS:V1.0", Q_NULLPTR));
+        helpLabel->setText(QApplication::translate("miniPSClass", "adsfasdf", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("miniPSClass", "File", Q_NULLPTR));
         menuEdit->setTitle(QApplication::translate("miniPSClass", "Edit", Q_NULLPTR));
         menucolor_operation->setTitle(QApplication::translate("miniPSClass", "color operation", Q_NULLPTR));
@@ -1652,7 +1662,6 @@ public:
         menuhough->setTitle(QApplication::translate("miniPSClass", "hough", Q_NULLPTR));
         menuSettings->setTitle(QApplication::translate("miniPSClass", "Settings", Q_NULLPTR));
         menuWindow_mode->setTitle(QApplication::translate("miniPSClass", "window mode", Q_NULLPTR));
-        menuHelp->setTitle(QApplication::translate("miniPSClass", "Help", Q_NULLPTR));
     } // retranslateUi
 
 };
