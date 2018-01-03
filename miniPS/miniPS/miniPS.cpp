@@ -143,7 +143,7 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.skeletonBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeleton()));
 	connect(ui.SkeletonReconBtn, SIGNAL(clicked()), this, SLOT(on_slotSkeletonRecon()));
 	connect(ui.reconstructionBtn, SIGNAL(clicked()), this, SLOT(on_slotGrayRecon()));
-	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed));
+	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed()));
 
 
 	// Set shortcut for menu
@@ -151,6 +151,9 @@ miniPS::miniPS(QWidget *parent)
 	ui.actionopen_image->setShortcut(Qt::CTRL | Qt::Key_L);
 	ui.actionundo->setShortcut(Qt::CTRL | Qt::Key_Z);
 	ui.actionmophology->setShortcut(Qt::CTRL | Qt::Key_M);
+	ui.actionresize->setShortcut(Qt::CTRL | Qt::Key_R);
+	ui.actionOtus_Algo->setShortcut(Qt::CTRL | Qt::Key_B);
+	ui.actionRGB2GrayScale->setShortcut(Qt::CTRL | Qt::Key_G);
 
 	// Set zoom slider
 	ui.horizontalSlider->setOrientation(Qt::Horizontal);
@@ -330,6 +333,7 @@ void miniPS::on_slotLoadImage_trigged() {
 		    
 			myProcessor.loadImage(qPrintable(fileName), focusedLayer);
 			refreshImg();
+			imagesDirtyFlag[focusedLayer] = 1;
 	}
 }
 
@@ -367,6 +371,7 @@ void miniPS::on_slotSave_trigged() {
 	if (fileName != "") {
 		myProcessor.saveImage(qPrintable(fileName), focusedLayer);
 		QMessageBox::about(NULL, "Saved", "Your current image is saved.");
+		imagesDirtyFlag[focusedLayer] = 0;
 	}
 }
 
@@ -1336,11 +1341,45 @@ Mat miniPS::parseInputKernel() {
 	Mat B;
 	switch (this->mophoCurTab) {
 	case 0: { // 3*3
-
+		B = Mat(3, 3, CV_32FC1);
+		B.at<int>(0, 0) = ui.inputMoph3_0->value();
+		B.at<int>(0, 1) = ui.inputMoph3_1->value();
+		B.at<int>(0, 2) = ui.inputMoph3_2->value();
+		B.at<int>(1, 0) = ui.inputMoph3_3->value();
+		B.at<int>(1, 1) = ui.inputMoph3_4->value();
+		B.at<int>(1, 2) = ui.inputMoph3_5->value();
+		B.at<int>(2, 0) = ui.inputMoph3_6->value();
+		B.at<int>(2, 1) = ui.inputMoph3_7->value();
+		B.at<int>(2, 2) = ui.inputMoph3_8->value();
 		break;
 	}
 	case 1: { // 5*5
-
+		B = Mat(5, 5, CV_32FC1);
+		B.at<int>(0, 0) = ui.inputMoph5_0->value();
+		B.at<int>(0, 1) = ui.inputMoph5_1->value();
+		B.at<int>(0, 2) = ui.inputMoph5_2->value();
+		B.at<int>(0, 3) = ui.inputMoph5_3->value();
+		B.at<int>(0, 4) = ui.inputMoph5_4->value();
+		B.at<int>(1, 0) = ui.inputMoph5_5->value();
+		B.at<int>(1, 1) = ui.inputMoph5_6->value();
+		B.at<int>(1, 2) = ui.inputMoph5_7->value();
+		B.at<int>(1, 3) = ui.inputMoph5_8->value();
+		B.at<int>(1, 4) = ui.inputMoph5_9->value();
+		B.at<int>(2, 0) = ui.inputMoph5_10->value();
+		B.at<int>(2, 1) = ui.inputMoph5_11->value();
+		B.at<int>(2, 2) = ui.inputMoph5_12->value();
+		B.at<int>(2, 3) = ui.inputMoph5_13->value();
+		B.at<int>(2, 4) = ui.inputMoph5_14->value();
+		B.at<int>(3, 0) = ui.inputMoph5_15->value();
+		B.at<int>(3, 1) = ui.inputMoph5_16->value();
+		B.at<int>(3, 2) = ui.inputMoph5_17->value();
+		B.at<int>(3, 3) = ui.inputMoph5_18->value();
+		B.at<int>(3, 4) = ui.inputMoph5_19->value();
+		B.at<int>(4, 0) = ui.inputMoph5_20->value();
+		B.at<int>(4, 1) = ui.inputMoph5_21->value();
+		B.at<int>(4, 2) = ui.inputMoph5_22->value();
+		B.at<int>(4, 3) = ui.inputMoph5_23->value();
+		B.at<int>(4, 4) = ui.inputMoph5_24->value();
 		break;
 	}
 	case 2: { // m*n
@@ -1453,7 +1492,7 @@ void miniPS::on_slotSkeleton() {
 	}
 	myProcessor.commit(focusedLayer);
 
-	myProcessor.extractSkeleton(focusedLayer);
+	myProcessor.skeleton(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1476,7 +1515,9 @@ void miniPS::on_slotSkeletonRecon() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	myProcessor.commit(focusedLayer);
 
+	myProcessor.skeletonRecon(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }
@@ -1518,7 +1559,9 @@ void miniPS::on_slotWatershed() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
+	myProcessor.commit(focusedLayer);
 
+	myProcessor.watershed(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
 }

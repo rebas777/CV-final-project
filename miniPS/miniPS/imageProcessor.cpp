@@ -1641,3 +1641,270 @@ void ImageProcessor::extractSkeleton(int idx) {
 		}
 	}
 }
+
+// Union A and B, result stored in A. (A and B are binary images)
+inline void matUnion(Mat &A, Mat B) {
+	if (A.size() != B.size() || A.type() != B.type()) {
+		qDebug("Bad input mat: two mat mast have same format to union.\n");
+	}
+	for (int i = 0; i < A.rows; i++) {
+		for (int j = 0; j < A.cols; j++) {
+			if (B.at<Vec3b>(i, j)[0] > A.at<Vec3b>(i, j)[0]) {
+				A.at<Vec3b>(i, j) = B.at<Vec3b>(i, j);
+			}
+		}
+	}
+}
+
+// Check if a image's value is all 0;
+inline bool matEmpty(Mat &A) {
+	for (int i = 0; i < A.rows; i++) {
+		for (int j = 0; j < A.cols; j++) {
+			if (A.at<Vec3b>(i, j)[0] != 0) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+// Do skeleton extraction and then do skeleton reconstruction, default kernel is [111;111;111;]
+void ImageProcessor::skeleton(int idx) {
+	// Form default kernel
+	Mat B = Mat(3, 3, CV_32FC1);
+	B.at<int>(0, 0) = 1;
+	B.at<int>(0, 1) = 1;
+	B.at<int>(0, 2) = 1;
+	B.at<int>(1, 0) = 1;
+	B.at<int>(1, 1) = 1;
+	B.at<int>(1, 2) = 1;
+	B.at<int>(2, 0) = 1;
+	B.at<int>(2, 1) = 1;
+    B.at<int>(2, 2) = 1;
+
+	// Vector to store middle variables
+	std::vector<Mat> SkAs = {};
+	
+
+	Mat S = Mat(images[idx].size(), images[idx].type());
+	SkAs.push_back(S); // SkAs[0], dummy mat
+	int k = 1;
+	this->erosion(B, 1, 1, idx);
+	Mat erosionImg = images[idx].clone();
+	this->open(B, 1, 1, idx);
+	Mat erosionOpenImg = images[idx].clone();
+	images[idx] = erosionImg;
+	S = erosionImg - erosionOpenImg;
+	SkAs.push_back(S);
+	while (!matEmpty(images[idx])) {
+		k++;
+		this->erosion(B, 1, 1, idx);
+		Mat erosionImg = images[idx].clone();
+		this->open(B, 1, 1, idx);
+		Mat erosionOpenImg = images[idx].clone();
+		images[idx] = erosionImg;
+		Mat SkA = erosionImg - erosionOpenImg;
+		matUnion(S, SkA);
+		SkAs.push_back(SkA);
+	}
+	
+	// 至此，骨架提取完毕，k值为腐蚀的次数, SkAs中保存所有的中间过程变量
+
+	images[idx] = S.clone();
+
+}
+
+void ImageProcessor::skeletonRecon(int idx) {
+	// Form default kernel
+	Mat B = Mat(3, 3, CV_32FC1);
+	B.at<int>(0, 0) = 1;
+	B.at<int>(0, 1) = 1;
+	B.at<int>(0, 2) = 1;
+	B.at<int>(1, 0) = 1;
+	B.at<int>(1, 1) = 1;
+	B.at<int>(1, 2) = 1;
+	B.at<int>(2, 0) = 1;
+	B.at<int>(2, 1) = 1;
+	B.at<int>(2, 2) = 1;
+
+	// Vector to store middle variables
+	std::vector<Mat> SkAs = {};
+
+
+	Mat S = Mat(images[idx].size(), images[idx].type());
+	SkAs.push_back(S); // SkAs[0], dummy mat
+	int k = 1;
+	this->erosion(B, 1, 1, idx);
+	Mat erosionImg = images[idx].clone();
+	this->open(B, 1, 1, idx);
+	Mat erosionOpenImg = images[idx].clone();
+	images[idx] = erosionImg;
+	S = erosionImg - erosionOpenImg;
+	SkAs.push_back(S);
+	while (!matEmpty(images[idx])) {
+		k++;
+		this->erosion(B, 1, 1, idx);
+		Mat erosionImg = images[idx].clone();
+		this->open(B, 1, 1, idx);
+		Mat erosionOpenImg = images[idx].clone();
+		images[idx] = erosionImg;
+		Mat SkA = erosionImg - erosionOpenImg;
+		matUnion(S, SkA);
+		SkAs.push_back(SkA);
+	}
+
+	// 至此，骨架提取完毕，k值为腐蚀的次数, SkAs中保存所有的中间过程变量，下面进行骨架重构
+
+
+	Mat reconImg;
+	for (int i = 1; i <= k; i++) {
+		images[idx] = SkAs[i];
+		for (int j = 0; j < i; j++) { // dilation k times
+			dilation(B, 1, 1,idx);
+		}
+		if (i == 1) {
+			reconImg = images[idx];
+		}
+		else {
+			matUnion(reconImg, images[idx]);
+		}
+	}
+	images[idx] = reconImg.clone();
+}
+
+
+// Watershed
+
+class MyPoint {
+public:
+	int row;//row
+	int col;//col
+	MyPoint(int r, int c) { row = r; col = c; }
+};
+
+class WSMark {
+public:
+	int markNum;
+	int ladder;
+	WSMark(int m, int l) { markNum = m; ladder = l; }
+
+};
+
+std::vector<int> static getMaskAroundPoint(Mat &mark, MyPoint point) {
+	int r = point.row, c = point.col;
+	std::set<int> marks;
+	std::vector<int> result;
+	for (int i = r - 1; i <= r + 1; i++) {
+		for (int j = c - 1; j <= c + 1; j++) {
+			if (i > 0 && i < (mark.rows - 1) && j>0 && j < (mark.cols - 1)) {
+				if (mark.at<int>(i, j) != 0) {
+
+					marks.insert(mark.at<int>(i, j));
+				}
+
+			}
+		}
+	}
+
+	for (int mark : marks)
+		result.push_back(mark);
+
+	return result;
+}
+
+int static getRoot(std::map<int, int> &markTree, int node) {
+	int tmpnode = markTree[node];
+	if (tmpnode != node) { return getRoot(markTree, tmpnode); }
+	else { return node; }
+}
+
+Mat static waterShed(Mat &src, const int ladder) {
+	std::set<int> testset;
+	std::vector<std::vector<MyPoint>> pointLayer(256);
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			int index = ((int)src.at<uchar>(i, j)) / ladder;
+			testset.insert(index);
+			uchar val = src.at<uchar>(i, j);
+			pointLayer[val / ladder].push_back(MyPoint(i, j));
+		}
+	}
+	for (int i : testset) { std::cout << i << std::endl; }
+	Mat mark(src.size(), CV_32SC1, Scalar(0));
+	Mat result(src.size(), src.type(), Scalar(0));
+	std::vector<int> mapOfLadder;
+	int markNum = 0;
+	std::map<int, int> markTree;
+
+
+	for (int i = 0; i < 255 / ladder; i++) {
+		for (MyPoint p : pointLayer[i]) {
+			std::vector<int> markers = getMaskAroundPoint(mark, p);
+			if (markers.size() == 0) {//no points around is marked
+				mark.at<int>(p.row, p.col) = markNum;
+				mapOfLadder.push_back(i);
+				markTree[markNum] = markNum;
+				markNum++;
+			}
+			else if (markers.size() == 1) {
+				mark.at<int>(p.row, p.col) = getRoot(markTree, markers[0]);
+			}
+			else {
+				bool differentRoot = false;
+				for (int j = 0; j < markers.size() - 1; j++) {
+					int root1 = getRoot(markTree, markers[j]);
+					int root2 = getRoot(markTree, markers[j + 1]);
+					if (root1 == root2) {//same root
+						continue;
+					}
+					else if (mapOfLadder[markers[j]] == i&& mapOfLadder[markers[j + 1]] == i) {
+						//same ladder 
+						markTree[root2] = root1;//set to same root
+						markTree[markers[j + 1]] = root1;//collapse the tree
+						continue;
+					}
+					else {//conflict
+						mark.at<int>(p.row, p.col) = root1;
+						differentRoot = true;
+						break;
+					}
+				}
+				if (differentRoot == false) {
+					mark.at<int>(p.row, p.col) = getRoot(markTree, markers[0]);
+				}
+			}
+		}
+	}
+
+	for (int r = 0; r < mark.rows; r++) {
+		for (int c = 0; c < mark.cols; c++) {
+			std::vector<int> marks = getMaskAroundPoint(mark, MyPoint(r, c));
+			if (marks.size() <= 1)
+				continue;
+			std::set<int> roots;
+			for (int r : marks) {
+				roots.insert(getRoot(markTree, r));
+			}
+			if (roots.size() >= 2)
+				result.at<uchar>(r, c) = 255;
+		}
+	}
+	return result;
+
+}
+
+void ImageProcessor::watershed(int idx) {
+	Mat binImg = images[idx].clone();
+	std::vector<Mat>channels;
+	split(binImg, channels);
+	binImg = channels.at(0);// 取单通道
+	binImg = waterShed(binImg, 3);
+	// change tmpImg to three-channel image
+	for (int i = 0; i < binImg.rows; i++) {
+		for (int j = 0; j < binImg.cols; j++) {
+			unsigned char tmp = binImg.at<uchar>(i, j);
+			Vec3b tmpVec = { tmp, tmp, tmp };
+			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}

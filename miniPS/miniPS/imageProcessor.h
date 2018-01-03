@@ -97,4 +97,8 @@ public:
 	Mat skeleton(Mat &srcin);
 	void extractSkeleton(int idx);
 
+	void skeleton(int idx);
+	void skeletonRecon(int idx);
+
+	void watershed(int idx);
 };

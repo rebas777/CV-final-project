@@ -1,4 +1,17 @@
 <RCC>
-    <qresource prefix="miniPS">
-    </qresource>
+  <qresource prefix="miniPS">
+    <file>Resources/browse.png</file>
+    <file>Resources/add.png</file>
+    <file>Resources/cut.png</file>
+    <file>Resources/exchange.png</file>
+    <file>Resources/im-eraser.png</file>
+    <file>Resources/multiply.png</file>
+    <file>Resources/pen.png</file>
+    <file>Resources/pick.png</file>
+    <file>Resources/reset.png</file>
+    <file>Resources/rotate.png</file>
+    <file>Resources/select.png</file>
+    <file>Resources/sub.png</file>
+    <file>Resources/mouse-pointer.png</file>
+  </qresource>
 </RCC>
