@@ -22,6 +22,7 @@ miniPS::miniPS(QWidget *parent)
 	ui.UGSAWidget->setVisible(false);
 	ui.selfFilterWidget->setVisible(false);
 	ui.MophologyWidget->setVisible(false);
+	ui.ladderWidget->setVisible(false);
 
 	//init focused layer
 	focusedLayer = ui.tabWidget->currentIndex();
@@ -148,6 +149,13 @@ miniPS::miniPS(QWidget *parent)
 	connect(ui.reconstructionBtn, SIGNAL(clicked()), this, SLOT(on_slotGrayRecon()));
 	connect(ui.watershedBtn, SIGNAL(clicked()), this, SLOT(on_slotWatershed()));
 	connect(ui.helpLabel, SIGNAL(linkActivated(QString)), this, SLOT(openUrl(QString)));
+	connect(ui.actionbinary_value_exchange, SIGNAL(triggered()), this, SLOT(on_slotBinEx()));
+	connect(ui.actionsharpen, SIGNAL(triggered()), this, SLOT(on_slotSharpen()));
+	connect(ui.actionpseudo_color, SIGNAL(triggered()), this, SLOT(on_slotPseudoColor()));
+	connect(ui.minMaxBtn, SIGNAL(clicked()), this, SLOT(on_slotMinMax()));
+	connect(ui.mosaicBtn, SIGNAL(clicked()), this, SLOT(on_slotMosaicMode_trigged()));
+	connect(ui.actionladder, SIGNAL(triggered()), this, SLOT(on_slotLadder_trigged()));
+	connect(ui.ladderOkBtn, SIGNAL(clicked()), this, SLOT(on_ladderOk_trigged()));
 
 
 	// Set shortcut for menu
@@ -360,6 +368,8 @@ void miniPS::refreshImg() {
 		this, SLOT(on_viewEraserMove_trigged(int, int)));
 	connect(scene, SIGNAL(colorClick(int, int)),
 		this, SLOT(on_viewColorClick_trigged(int, int)));
+	connect(scene, SIGNAL(mosaicMove(int, int)),
+		this, SLOT(on_viewMosaicMove_trigged(int, int)));
 	scene->setParentView(*myViews[focusedLayer]);
 	scene->addPixmap(QPixmap::fromImage(tmp));
 	myViews[focusedLayer]->setScene(scene);
@@ -483,6 +493,16 @@ void miniPS::on_slotPenMode_trigged() {
 	}
 	myViews[focusedLayer]->mode = 2;
 	qDebug("Now in the pen mode \n");
+}
+
+// When the "mosaic" button is pressed(change to the pen mode)
+void miniPS::on_slotMosaicMode_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "Load Image First", "Please load an image before selection");
+		return;
+	}
+	myViews[focusedLayer]->mode = 5;
+	qDebug("Now in the mosaic mode \n");
 }
 
 // When the "eraser" button is pressed(change to the eraser mode)
@@ -623,6 +643,20 @@ void miniPS::on_viewColorClick_trigged(int x, int y) {
 	QString css;
 	css.sprintf("QLabel { background-color : rgb(%d,%d,%d); color : blue; }", color1[0], color1[1], color1[2]);
 	ui.picked_color1->setStyleSheet(css);
+}
+
+// Self-defined SLOT triggered by a SIGNAL from MyScene
+void miniPS::on_viewMosaicMove_trigged(int x, int y) {
+	if (x < 0)  x = 0;
+	if (y < 0)  y = 0;
+	if (x >= myProcessor.images[focusedLayer].cols)
+		x = myProcessor.images[focusedLayer].cols - 1;
+	if (y >= myProcessor.images[focusedLayer].rows)
+		y = myProcessor.images[focusedLayer].rows - 1;
+
+	//qDebug("mosaic!!");
+	myProcessor.mosaic(x, y, focusedLayer);
+	refreshImg();
 }
 
 // When "color ex" button is pressed
@@ -777,6 +811,16 @@ void miniPS::on_slotOtsu_trigged() {
 		return;
 	}
 	myProcessor.toBinary(true, 0, 0, focusedLayer);
+	refreshImg();
+}
+
+// When "binary exchange" button is pressed
+void miniPS::on_slotBinEx() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.binExchange(focusedLayer);
 	refreshImg();
 }
 
@@ -1009,7 +1053,8 @@ void miniPS::on_filterOk_trigged() {
 		myProcessor.gaussianFilter(kernelSize, focusedLayer);
 	}
 	else { // Median filtering
-		myProcessor.medianFilter(kernelSize, focusedLayer);
+		// myProcessor.medianFilter(kernelSize, focusedLayer);
+		medianBlur(myProcessor.images[focusedLayer], myProcessor.images[focusedLayer], kernelSize);
 	}
 	refreshImg();
 	ui.filterWidget->setVisible(false);
@@ -1273,7 +1318,7 @@ void miniPS::on_slotHelloWorld_trigged() {
 		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
 		return;
 	}
-	myProcessor.resize(20, 20, NN, focusedLayer);
+	myProcessor.resize(28, 28, NN, focusedLayer);
 	int res = myProcessor.helloWorld(focusedLayer);
 	refreshImg();
 	QString report;
@@ -1573,4 +1618,57 @@ void miniPS::on_slotWatershed() {
 	myProcessor.watershed(focusedLayer);
 	refreshImg();
 	ui.MophologyWidget->setVisible(false);
+}
+
+void miniPS::on_slotMinMax() {
+	if (myViews[focusedLayer]->scene() == NULL 
+		||myViews[(focusedLayer + 1)%5] == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	myProcessor.minMax(focusedLayer);
+	refreshImg();
+	int tmp = focusedLayer;
+	focusedLayer = (focusedLayer + 1) % 5;
+	refreshImg();
+	focusedLayer = tmp;
+}
+
+void miniPS::on_slotSharpen() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	refreshImg();
+}
+
+void miniPS::on_slotPseudoColor() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+	myProcessor.rgb2gry(focusedLayer);
+	myProcessor.pseudoColor(focusedLayer);
+
+	refreshImg();
+}
+
+void miniPS::on_slotLadder_trigged() {
+	if (myViews[focusedLayer]->scene() == NULL) {
+		QMessageBox::about(NULL, "No Image", "Please load an image before operation");
+		return;
+	}
+
+	ui.ladderWidget->setVisible(true);
+
+}
+
+void miniPS::on_ladderOk_trigged() {
+	int ladder = ui.inputLadder->value();
+	
+	myProcessor.ladder(ladder, focusedLayer);
+	refreshImg();
+	ui.ladderWidget->setVisible(false);
 }

@@ -860,13 +860,39 @@ background-color: rgb(225, 225, 225);</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>310</y>
+       <y>370</y>
        <width>112</width>
-       <height>241</height>
+       <height>181</height>
       </rect>
      </property>
      <property name="text">
       <string>HelloWorld</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="mosaicBtn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>310</y>
+       <width>51</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mosaic</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="minMaxBtn">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>310</y>
+       <width>51</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>minMax</string>
      </property>
     </widget>
    </widget>
@@ -2468,6 +2494,58 @@ background-color: rgb(225, 225, 225);</string>
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="ladderWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>441</width>
+       <height>200</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="label_57">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>81</width>
+        <height>18</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ladder:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="inputLadder">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>70</y>
+        <width>49</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ladderOkBtn">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>140</y>
+        <width>112</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="MophologyWidget" native="true">
      <property name="geometry">
       <rect>
@@ -3313,6 +3391,9 @@ background-color: rgb(225, 225, 225);</string>
      <addaction name="menuchannel_split"/>
      <addaction name="actionRGB2GrayScale"/>
      <addaction name="actionHSB"/>
+     <addaction name="actionmin_max"/>
+     <addaction name="actionpseudo_color"/>
+     <addaction name="actionladder"/>
     </widget>
     <widget class="QMenu" name="menubinary_analysis">
      <property name="title">
@@ -3320,6 +3401,7 @@ background-color: rgb(225, 225, 225);</string>
      </property>
      <addaction name="actionOtus_Algo"/>
      <addaction name="actiondouble_threshod"/>
+     <addaction name="actionbinary_value_exchange"/>
     </widget>
     <widget class="QMenu" name="menudraw_histogram">
      <property name="title">
@@ -3642,6 +3724,36 @@ background-color: rgb(225, 225, 225);</string>
   <action name="actionDocument">
    <property name="text">
     <string>Document</string>
+   </property>
+  </action>
+  <action name="actionbinary_value_exchange">
+   <property name="text">
+    <string>binary value exchange</string>
+   </property>
+  </action>
+  <action name="actionmin_max">
+   <property name="text">
+    <string>min/max</string>
+   </property>
+  </action>
+  <action name="actionmosaic">
+   <property name="text">
+    <string>mosaic</string>
+   </property>
+  </action>
+  <action name="actionpseudo_color">
+   <property name="text">
+    <string>pseudo-color</string>
+   </property>
+  </action>
+  <action name="actionsharpen">
+   <property name="text">
+    <string>sharpen</string>
+   </property>
+  </action>
+  <action name="actionladder">
+   <property name="text">
+    <string>ladder</string>
    </property>
   </action>
  </widget>

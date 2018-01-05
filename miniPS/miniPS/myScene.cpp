@@ -51,6 +51,11 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 			emit penMove(posX, posY);
 		}
 	}
+	if (parentView->mode == 5) { // mosaic mode
+		if (m_isMousePress) {
+			emit mosaicMove(posX, posY);
+		}
+	}
 	if (parentView->mode == 3) { // eraser mode
 		if (m_isMousePress) {
 			emit eraserMove(posX, posY);

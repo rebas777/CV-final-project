@@ -48,6 +48,7 @@ public:
 	void changeHSV(int hsvNum, int val, int idx);
 	void channelSplit(int rgbNum, int idx);
 	void toBinary(bool useOtsu, int th1, int th2, int idx);
+	void binExchange(int idx);
 	void addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY);
 	void subtractionOper(int idx1, int idx2, int posX, int posY);
 	bool multiplicationOper(int idx1, int idx2);
@@ -101,4 +102,13 @@ public:
 	void skeletonRecon(int idx);
 
 	void watershed(int idx);
+
+
+	void pseudoColor(int idx);
+	
+	void minMax(int idx);
+
+	void mosaic(int x, int y, int idx);
+
+	void ladder(int ladder, int idx);
 };

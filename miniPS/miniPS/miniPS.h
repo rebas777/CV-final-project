@@ -73,6 +73,7 @@ void on_slotZoomSlid(int cur);
 void on_slotFreshScalVal();
 void on_slotSlctMode_trigged();
 void on_slotPenMode_trigged();
+void on_slotMosaicMode_trigged();
 void on_slotEraserMode_trigged();
 void on_slotPickMode_trigged();
 void on_slotNormMode_trigged();
@@ -82,6 +83,7 @@ void on_viewMouseMove_trigged(int x, int y);  // Self-defined slot
 void on_viewPenMove_trigged(int x, int y); // Self-defined slot
 void on_viewEraserMove_trigged(int x, int y); // Self-defined slot
 void on_viewColorClick_trigged(int x, int y); // Self-defined slot
+void on_viewMosaicMove_trigged(int x, int y); // Self-defined slot
 void on_channelSplitR_trigged();
 void on_channelSplitG_trigged();
 void on_channelSplitB_trigged();
@@ -94,6 +96,7 @@ void on_slotHSVslidV_trigged(int cur);
 void on_slotDbTh_trigged();
 void on_slotDbThok_trigged();
 void on_slotOtsu_trigged();
+void on_slotBinEx();
 void on_slotAdd_trigged();
 void on_slotSubtraction_trigged();
 void on_slotMultiplication_trigged();
@@ -146,5 +149,14 @@ void on_slotGrayRecon();
 void on_slotWatershed();
 
 void openUrl(QString url);
+
+
+void on_slotMinMax();
+void on_slotPseudoColor();
+void on_slotSharpen();
+
+
+void on_slotLadder_trigged();
+void on_ladderOk_trigged();
 
 };

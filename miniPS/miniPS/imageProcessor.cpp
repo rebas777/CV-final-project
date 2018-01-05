@@ -255,6 +255,26 @@ int ImageProcessor::otsu(Mat img) {
 	return(thresholdValue);
 }
 
+void ImageProcessor::binExchange(int idx) {
+	commit(idx);
+	for (int i = 0; i < images[idx].rows; i++) {
+		for (int j = 0; j < images[idx].cols; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			if (tmp[0] == 0) {
+				tmp[0] = 255;
+				tmp[1] = 255;
+				tmp[2] = 255;
+			}
+			else if (tmp[0] == 255) {
+				tmp[0] = 0;
+				tmp[1] = 0;
+				tmp[2] = 0;
+			}
+			images[idx].at<Vec3b>(i, j) = tmp;
+		}
+	}
+}
+
 void ImageProcessor::addOper(int idx1, int idx2, double weight1, double weight2, int posX, int posY) {
 	commit(idx1);
 	int iRows1 = images[idx1].rows;
@@ -771,7 +791,7 @@ void ImageProcessor::medianFilter(int ksize, int idx) {
 			newImg.at<Vec3b>(i, j) = tmp;
 		}
 	}
-	images[idx] = newImg;
+	images[idx] = newImg.clone();
 }
 
 // Part of Canny filter
@@ -852,33 +872,25 @@ void LocalMaxValue(const Mat imageInput, Mat &imageOutput, double *pointDrection
 			int value21 = imageInput.at<uchar>((i + 1), j);
 			int value22 = imageInput.at<uchar>((i + 1), j + 1);
 
-			if (pointDrection[k]>0 && pointDrection[k] <= 45)
-			{
-				if (value11 <= (value12 + (value02 - value12)*tan(pointDrection[(i-1)*imageOutput.rows + j])) || (value11 <= (value10 + (value20 - value10)*tan(pointDrection[(i-1)*imageOutput.rows + j]))))
-				{
-					imageOutput.at<uchar>(i, j) = 0;
-				}
-			}
-			if (pointDrection[k]>45 && pointDrection[k] <= 90)
+			// use 0, 45, 90, 135 four direction to approximate all directions
 
-			{
-				if (value11 <= (value01 + (value02 - value01) / tan(pointDrection[(i - 1)*imageOutput.cols + j])) || value11 <= (value21 + (value20 - value21) / tan(pointDrection[(i - 1)*imageOutput.cols + j])))
-				{
-					imageOutput.at<uchar>(i, j) = 0;
-
-				}
-			}
-			if (pointDrection[k]>90 && pointDrection[k] <= 135)
-			{
-				if (value11 <= (value01 + (value00 - value01) / tan(180 - pointDrection[(i - 1)*imageOutput.cols + j])) || value11 <= (value21 + (value22 - value21) / tan(180 - pointDrection[(i - 1)*imageOutput.cols + j])))
-				{
+			if (pointDrection[k] <= 22.5 || pointDrection[k] > 157.5) { // 0: compare with value10 and value12
+				if (value11 <= value10 || value11 <= value12) {
 					imageOutput.at<uchar>(i, j) = 0;
 				}
 			}
-			if (pointDrection[k]>135 && pointDrection[k] <= 180)
-			{
-				if (value11 <= (value10 + (value00 - value10)*tan(180 - pointDrection[(i-1)*imageOutput.cols + j])) || value11 <= (value12 + (value22 - value11)*tan(180 - pointDrection[(i-1)*imageOutput.cols + j])))
-				{
+			if (pointDrection[k] > 22.5 && pointDrection[k] <= 67.5) {  // 45: compare with value02 and value20
+				if (value11 <= value02 || value11 <= value20) {
+					imageOutput.at<uchar>(i, j) = 0;
+				}
+			}
+			if (pointDrection[k] > 67.5 && pointDrection[k] <= 112.5) { // 90: compare with value01 and value21
+				if (value11 <= value01 || value11 <= value21) {
+					imageOutput.at<uchar>(i, j) = 0;
+				}
+			}
+			if (pointDrection[k] > 112.5 && pointDrection[k] <= 157.5) { // 135: compare with value00 and value22
+				if (value11 <= value00 || value11 <= value22) {
 					imageOutput.at<uchar>(i, j) = 0;
 				}
 			}
@@ -953,8 +965,8 @@ void ImageProcessor::canny(int idx) {
 	LocalMaxValue(SobelGradAmpl, imageLocalMax, pointDirection);  //局部非极大值抑制  
 	Mat cannyImage;
 	cannyImage = Mat::zeros(imageLocalMax.size(), CV_8UC1);
-	DoubleThreshold(imageLocalMax, 40, 100);        //双阈值处理  
-	DoubleThresholdLink(imageLocalMax, 40, 100);   //双阈值中间阈值滤除及连接  
+	DoubleThreshold(imageLocalMax, 30, 80);        //双阈值处理  
+	DoubleThresholdLink(imageLocalMax, 30, 80);   //双阈值中间阈值滤除及连接  
 
 	// then recover the 3 channels image
 	for (int i = 0; i < iRows; i++) {
@@ -967,7 +979,7 @@ void ImageProcessor::canny(int idx) {
 }
 
 void ImageProcessor::initPara() {
-	Theta1 = Mat(25, 401, CV_32FC1);
+	Theta1 = Mat(25, 785, CV_32FC1);
 	Theta2 = Mat(10, 26, CV_32FC1);
 	FILE *fp1, *fp2;
 	double tmp;
@@ -980,7 +992,7 @@ void ImageProcessor::initPara() {
 		return;
 	}
 	for (int i = 0; i < 25; i++) {
-		for (int j = 0; j < 401; j++) {
+		for (int j = 0; j < 785; j++) {
 			fscanf(fp1, "%lf", &tmp);
 			Theta1.at<float>(i, j) = tmp;
 		}
@@ -1022,15 +1034,18 @@ Mat ImageProcessor::sigmoid(Mat src) {
 
 // Recognize handwriting with trained NN
 int ImageProcessor::helloWorld(int idx) {
-	Mat imgVec = Mat(400, 1, CV_32FC1);
+	Mat imgVec = Mat(784, 1, CV_32FC1);
 	int iRows = images[idx].rows;
 	int iCols = images[idx].cols;
-	if (iRows != 20 || iCols != 20) {
+	if (iRows != 28 || iCols != 28) {
 		qDebug("Bad image size !\n");
 		return -1;
 	}
 	initPara();
 	
+	// Do transpose
+	transpose(images[idx], images[idx]);
+
 	// Vectorization of image[idx]
 	int cur = 0;
 	for (int i = 0; i < iRows; i++) {
@@ -1041,15 +1056,15 @@ int ImageProcessor::helloWorld(int idx) {
 	}
 
 	// Map grayscale 0~255 to 0.0~1.0
-	for (int i = 0; i < 400; i++) {
+	for (int i = 0; i < 784; i++) {
 		float tmp = imgVec.at<float>(i, 0);
 		tmp = tmp / 255.0;
 		imgVec.at<float>(i, 0) = tmp;
 	}
 
-	Mat a1 = Mat(401, 1, CV_32FC1);
+	Mat a1 = Mat(785, 1, CV_32FC1);
 	a1.at<float>(0, 0) = 1;
-	for (int k = 0; k < 400; k++) {
+	for (int k = 0; k < 784; k++) {
 		a1.at<float>(k + 1, 0) = imgVec.at<float>(k, 0);
 	}
 
@@ -1790,13 +1805,14 @@ public:
 
 };
 
+// 统计指定点八邻域中被标记的点的数目
 std::vector<int> static getMaskAroundPoint(Mat &mark, MyPoint point) {
 	int r = point.row, c = point.col;
 	std::set<int> marks;
 	std::vector<int> result;
 	for (int i = r - 1; i <= r + 1; i++) {
 		for (int j = c - 1; j <= c + 1; j++) {
-			if (i > 0 && i < (mark.rows - 1) && j>0 && j < (mark.cols - 1)) {
+			if (i > 0 && i < (mark.rows - 1) && j>0 && j < (mark.cols - 1)) {// 越界检测
 				if (mark.at<int>(i, j) != 0) {
 
 					marks.insert(mark.at<int>(i, j));
@@ -1821,6 +1837,7 @@ int static getRoot(std::map<int, int> &markTree, int node) {
 Mat static waterShed(Mat &src, const int ladder) {
 	std::set<int> testset;
 	std::vector<std::vector<MyPoint>> pointLayer(256);
+	// 用给定的梯度去除所有的像素值，使其按梯度分离
 	for (int i = 0; i < src.rows; i++) {
 		for (int j = 0; j < src.cols; j++) {
 			int index = ((int)src.at<uchar>(i, j)) / ladder;
@@ -1837,8 +1854,9 @@ Mat static waterShed(Mat &src, const int ladder) {
 	std::map<int, int> markTree;
 
 
+	// 迭代次数为梯度级个数，依次淹没
 	for (int i = 0; i < 255 / ladder; i++) {
-		for (MyPoint p : pointLayer[i]) {
+		for (MyPoint p : pointLayer[i]) {// 对该梯度级中的每个点，
 			std::vector<int> markers = getMaskAroundPoint(mark, p);
 			if (markers.size() == 0) {//no points around is marked
 				mark.at<int>(p.row, p.col) = markNum;
@@ -1898,13 +1916,123 @@ void ImageProcessor::watershed(int idx) {
 	std::vector<Mat>channels;
 	split(binImg, channels);
 	binImg = channels.at(0);// 取单通道
-	binImg = waterShed(binImg, 3);
+	binImg = waterShed(binImg, 30);
 	// change tmpImg to three-channel image
 	for (int i = 0; i < binImg.rows; i++) {
 		for (int j = 0; j < binImg.cols; j++) {
 			unsigned char tmp = binImg.at<uchar>(i, j);
 			Vec3b tmpVec = { tmp, tmp, tmp };
 			images[idx].at<Vec3b>(i, j) = tmpVec;
+		}
+	}
+}
+
+void ImageProcessor::pseudoColor(int idx) {
+	commit(idx);
+	uchar ColorTalbe[] =
+	{
+		0, 0 , 0,   // 0黑色  
+		0, 0, 85,   // 1深蓝  
+		0, 85, 0,   // 2深绿  
+		85, 0, 0,   // 3深红  
+		64, 64, 64, // 4深灰  
+		85, 0, 85,  // 5蓝紫  
+		0, 0, 255,  // 6蓝色  
+		85, 85, 0,  // 7草绿  
+		0, 255, 0,  // 8绿色  
+		255, 0, 0,  // 9红色  
+		128, 128, 128, // 10灰色  
+		0, 255, 255,   // 11青色  
+		255, 255, 0,   // 12黄色  
+		255, 255, 255, // 13白色  
+		0, 85, 85,     // 14深蓝率  
+		255, 0, 255    // 15紫色  
+	};
+
+	for (int i = 0; i < images[idx].rows; i++) {
+		for (int j = 0; j < images[idx].cols; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			uchar val = tmp[0] >> 4;
+			tmp[0] = ColorTalbe[val * 3];
+			tmp[1] = ColorTalbe[val * 3 + 1];
+			tmp[2] = ColorTalbe[val * 3 + 2];
+			images[idx].at<Vec3b>(i, j) = tmp;
+		}
+	}
+}
+
+void ImageProcessor::minMax(int idx) {
+	if (images[idx].size() != images[(idx + 1) % 5].size()) {
+		qDebug("Bad input images: images should be in the same size to minMax! \n");
+		return;
+	}
+
+	commit(idx);
+	for (int i = 0; i < images[idx].rows; i++) {
+		for (int j = 0; j < images[idx].cols; j++) {
+			Vec3b tmp1 = images[idx].at<Vec3b>(i, j);
+			Vec3b tmp2 = images[(idx + 1) % 5].at<Vec3b>(i, j);
+			Vec3b min,max;
+			for (int k = 0; k < 3; k++) { // tmp1---min; tmp2---max
+				if (tmp2[k] < tmp1[k]) {
+					min[k] = tmp2[k];
+					max[k] = tmp1[k];
+				}
+				else {
+					min[k] = tmp1[k];
+					max[k] = tmp2[k];
+				}
+			}
+			images[idx].at<Vec3b>(i, j) = min;
+			images[(idx + 1) % 5].at<Vec3b>(i, j) = max;
+		}
+	}
+}
+
+void ImageProcessor::mosaic(int x, int y, int idx) {
+	commit(idx);
+	Mat tmpImg = images[idx].clone();
+	int x0 = x - 25;
+	int y0 = y - 25;
+	int x1 = x0 + 49;
+	int y1 = y0 + 49;
+	if (x0 < 0)
+		x0 = 0;
+	if (y0 < 0)
+		y0 = 0;
+	if (x1 >= images[idx].cols)
+		x1 = images[idx].cols - 1;
+	if (y1 >= images[idx].rows)
+		y1 = images[idx].rows - 1;
+
+	int dx = (x1 - x0) / 10;
+	int dy = (y1 - y0) / 10;
+	for (int i = y0; i <= y1; i++) {
+		int tmpY = dy * (i / 10);
+		for (int j = x0; j <= x1; j++) {
+			int tmpX = dx * (j / 10);
+			tmpImg.at<Vec3b>(i, j) = images[idx].at<Vec3b>(tmpY, tmpX );
+		}
+	}
+
+	images[idx] = tmpImg;
+}
+
+void ImageProcessor::ladder(int ladder, int idx) {
+	commit(idx);
+	int delta = 255 / ladder;
+
+	for (int i = 0; i < images[idx].rows; i++) {
+		for (int j = 0; j < images[idx].cols; j++) {
+			Vec3b tmp = images[idx].at<Vec3b>(i, j);
+			for (int k = 0; k < 3; k++) {
+				tmp[k] = tmp[k] / delta * delta + (delta/2);
+				if (tmp[k] > 255)
+					tmp[k] = 255;
+				if (tmp[k] < 0)
+					tmp[k] = 0;
+			}
+			images[idx].at<Vec3b>(i, j) = tmp;
 		}
 	}
 }

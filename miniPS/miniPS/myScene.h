@@ -31,6 +31,7 @@ private:
 signals:
 	void mouseMove(int x, int y); // self-defined signal, triggered when view mouseMoveEven happen.
 	void penMove(int x, int y);
+	void mosaicMove(int x, int y);
 	void eraserMove(int x, int y);
 	void colorClick(int x, int y); // will be emit when in the color pick mode(4) and there is a click on the canvas
 	
