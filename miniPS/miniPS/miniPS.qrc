@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="miniPS">
+    <file>Resources/mosaic.png</file>
+    <file>Resources/minmax.png</file>
     <file>Resources/browse.png</file>
     <file>Resources/add.png</file>
     <file>Resources/cut.png</file>

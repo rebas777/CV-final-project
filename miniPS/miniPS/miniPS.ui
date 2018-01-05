@@ -878,8 +878,12 @@ background-color: rgb(225, 225, 225);</string>
        <height>51</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">border-image: url(:/miniPS/Resources/mosaic.png);
+background-color: rgb(225, 225, 225);</string>
+     </property>
      <property name="text">
-      <string>mosaic</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="minMaxBtn">
@@ -891,8 +895,12 @@ background-color: rgb(225, 225, 225);</string>
        <height>51</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">border-image: url(:/miniPS/Resources/minmax.png);
+background-color: rgb(225, 225, 225);</string>
+     </property>
      <property name="text">
-      <string>minMax</string>
+      <string/>
      </property>
     </widget>
    </widget>

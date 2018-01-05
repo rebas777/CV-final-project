@@ -630,7 +630,8 @@ void ImageProcessor::logGSA(int A, int B, int C, int channelNum, int idx) {
 		for (int j = 0; j < iCols; j++) {
 			Vec3b tmp = images[idx].at<Vec3b>(i, j);
 			double value = tmp[2 - channelNum] * 1.00;
-			value = A + (log(value + 1)) / (B*log(C));
+			//value = A + (log(value + 1)) / (B*log(C));
+			value = C*log((double)(1 + value));
 			if (value > 255)
 				value = 255;
 			if (value < 0)

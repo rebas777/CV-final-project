@@ -724,9 +724,13 @@ public:
         mosaicBtn = new QPushButton(leftToolBar);
         mosaicBtn->setObjectName(QStringLiteral("mosaicBtn"));
         mosaicBtn->setGeometry(QRect(10, 310, 51, 51));
+        mosaicBtn->setStyleSheet(QLatin1String("border-image: url(:/miniPS/Resources/mosaic.png);\n"
+"background-color: rgb(225, 225, 225);"));
         minMaxBtn = new QPushButton(leftToolBar);
         minMaxBtn->setObjectName(QStringLiteral("minMaxBtn"));
         minMaxBtn->setGeometry(QRect(70, 310, 51, 51));
+        minMaxBtn->setStyleSheet(QLatin1String("border-image: url(:/miniPS/Resources/minmax.png);\n"
+"background-color: rgb(225, 225, 225);"));
         line_4 = new QFrame(centralWidget);
         line_4->setObjectName(QStringLiteral("line_4"));
         line_4->setGeometry(QRect(30, 60, 131, 20));
@@ -1614,8 +1618,8 @@ public:
         multiplicationBtn->setText(QString());
         spinBtn->setText(QString());
         helloWorldBtn->setText(QApplication::translate("miniPSClass", "HelloWorld", Q_NULLPTR));
-        mosaicBtn->setText(QApplication::translate("miniPSClass", "mosaic", Q_NULLPTR));
-        minMaxBtn->setText(QApplication::translate("miniPSClass", "minMax", Q_NULLPTR));
+        mosaicBtn->setText(QString());
+        minMaxBtn->setText(QString());
         label_9->setText(QApplication::translate("miniPSClass", "H\357\274\232", Q_NULLPTR));
         label_10->setText(QApplication::translate("miniPSClass", "S\357\274\232", Q_NULLPTR));
         label_11->setText(QApplication::translate("miniPSClass", "V:", Q_NULLPTR));
