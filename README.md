@@ -18,7 +18,8 @@
 - Watershed algorithm.
 
 ## Screenshots
-
+![Screenshot1](https://raw.githubusercontent.com/wiki/rebas777/CV-final-project/Screenshot1.jpg)
+![Screenshot2](https://raw.githubusercontent.com/wiki/rebas777/CV-final-project/Screenshot2.jpg)
 
 - Details and reflection:
 [here(zh_CN)](http://www.jianshu.com/p/dad9c0199e4d)
